@@ -39,10 +39,28 @@ export default function Welcome() {
     const [focusedField, setFocusedField] = useState<string | null>(null);
     const [form, setForm] = useState({ name: '', email: '', message: '' });
 
+    // Early bird deadline: 2 weeks before June 11 2026 = May 28 2026 00:00 PKT (UTC+5)
+    const EARLY_BIRD = new Date('2026-05-28T00:00:00+05:00').getTime();
+    const calcTime = () => {
+        const diff = Math.max(0, EARLY_BIRD - Date.now());
+        return {
+            days:    Math.floor(diff / 86400000),
+            hours:   Math.floor((diff % 86400000) / 3600000),
+            minutes: Math.floor((diff % 3600000)  / 60000),
+            seconds: Math.floor((diff % 60000)    / 1000),
+        };
+    };
+    const [countdown, setCountdown] = useState(calcTime);
+
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 60);
         window.addEventListener('scroll', onScroll);
         return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    useEffect(() => {
+        const id = setInterval(() => setCountdown(calcTime()), 1000);
+        return () => clearInterval(id);
     }, []);
 
     const scrollTo = (id: string) => {
@@ -412,7 +430,7 @@ export default function Welcome() {
                 </div>
 
                 <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-                    <p className="sec-label">About the Event</p>
+                    {/* <p className="sec-label">About the Event</p> */}
 
                     <h2 style={{
                         fontFamily: "'Russo One', sans-serif",
@@ -461,6 +479,72 @@ export default function Welcome() {
                             </div>
                         ))}
                     </div>
+                </div>
+            </section>
+
+            {/* ── EARLY BIRD COUNTDOWN ───────────────────────────────── */}
+            <section style={{ position: 'relative', padding: 'clamp(64px,11vh,112px) clamp(20px,7vw,110px)', background: '#08071A', overflow: 'hidden' }}>
+                {/* Background orbs */}
+                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                    <div style={{ position: 'absolute', width: '700px', height: '350px', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(168,85,247,0.18) 0%, transparent 65%)', filter: 'blur(50px)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+                    <div style={{ position: 'absolute', width: '400px', height: '200px', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(0,229,255,0.1) 0%, transparent 65%)', filter: 'blur(40px)', top: '20%', right: '10%' }} />
+                    <div style={{ position: 'absolute', width: '300px', height: '200px', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(217,70,239,0.1) 0%, transparent 65%)', filter: 'blur(40px)', bottom: '10%', left: '8%' }} />
+                </div>
+
+                <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                    <p className="sec-label">Limited Time Offer</p>
+                    <h2 style={{
+                        fontFamily: "'Russo One', sans-serif",
+                        fontSize: 'clamp(2rem,5.5vw,3.8rem)',
+                        color: '#F0EEFF', textTransform: 'uppercase',
+                        marginBottom: '12px', letterSpacing: '.02em',
+                    }}>
+                        Early Bird <span style={{ color: '#00E5FF' }}>Ends In</span>
+                    </h2>
+                    <p style={{ fontSize: '13px', color: '#8B8BAF', letterSpacing: '.08em', marginBottom: '52px', fontWeight: 300 }}>
+                        Register before <span style={{ color: '#00E5FF' }}>May 28, 2026</span> to unlock early bird pricing
+                    </p>
+
+                    {countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 && countdown.seconds === 0 ? (
+                        <p style={{ fontFamily: "'Russo One', sans-serif", fontSize: 'clamp(1.4rem,3vw,2rem)', color: '#A855F7', letterSpacing: '.08em', textTransform: 'uppercase' }}>
+                            Early Bird Registration Closed
+                        </p>
+                    ) : (
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(12px,3vw,28px)', flexWrap: 'wrap' }}>
+                            {([
+                                { val: countdown.days,    lbl: 'Days' },
+                                { val: countdown.hours,   lbl: 'Hours' },
+                                { val: countdown.minutes, lbl: 'Minutes' },
+                                { val: countdown.seconds, lbl: 'Seconds' },
+                            ] as const).map(({ val, lbl }) => (
+                                <div key={lbl} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+                                    <div style={{
+                                        width: 'clamp(80px,14vw,120px)', height: 'clamp(80px,14vw,120px)',
+                                        background: 'linear-gradient(135deg, rgba(0,229,255,0.12), rgba(168,85,247,0.18))',
+                                        border: '1px solid rgba(0,229,255,0.25)',
+                                        borderRadius: '16px',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        boxShadow: '0 0 30px rgba(0,229,255,0.1), inset 0 1px 0 rgba(255,255,255,0.08)',
+                                        position: 'relative', overflow: 'hidden',
+                                    }}>
+                                        {/* inner shimmer line */}
+                                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(0,229,255,0.4), transparent)' }} />
+                                        <span style={{
+                                            fontFamily: "'Russo One', sans-serif",
+                                            fontSize: 'clamp(2rem,5vw,3.2rem)',
+                                            background: 'linear-gradient(135deg, #00E5FF, #A855F7)',
+                                            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                                            backgroundClip: 'text', lineHeight: 1,
+                                            fontVariantNumeric: 'tabular-nums',
+                                        }}>
+                                            {String(val).padStart(2, '0')}
+                                        </span>
+                                    </div>
+                                    <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '.2em', textTransform: 'uppercase', color: '#8B8BAF' }}>{lbl}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
