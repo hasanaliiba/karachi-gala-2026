@@ -405,40 +405,61 @@ export default function Welcome() {
             <section id="about" style={{ position: 'relative', padding: 'clamp(72px,13vh,128px) clamp(20px,7vw,110px)', background: '#0D0C25' }}>
                 <div className="divider" style={{ position: 'absolute', top: 0, left: '8%', right: '8%' }} />
 
-                <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                {/* Subtle background orbs */}
+                <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+                    <div style={{ position: 'absolute', width: '600px', height: '300px', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(100,50,220,0.14) 0%, transparent 70%)', filter: 'blur(40px)', top: '10%', left: '50%', transform: 'translateX(-50%)' }} />
+                    <div style={{ position: 'absolute', width: '400px', height: '200px', borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(217,70,239,0.08) 0%, transparent 70%)', filter: 'blur(40px)', bottom: '10%', left: '50%', transform: 'translateX(-50%)' }} />
+                </div>
+
+                <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
                     <p className="sec-label">About the Event</p>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))', gap: 'clamp(48px,8vw,96px)', alignItems: 'start' }}>
-                        <div>
-                            <h2 className="sec-heading" style={{ marginBottom: '32px' }}>
-                                WHERE IBA<br /><span>COMES ALIVE</span>
-                            </h2>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', color: '#9D9DC0', fontSize: '14px', lineHeight: 1.9, fontWeight: 300 }}>
-                                <p style={{ borderLeft: '2px solid rgba(0,229,255,0.35)', paddingLeft: '16px' }}>
-                                    Karachi Gala League is IBA's most anticipated annual multi-sport event, uniting students across all departments in a celebration of competition, camaraderie, and campus spirit.
-                                </p>
-                                <p>
-                                    From the calculated calm of chess to the thunderous roar of a cricket match, KGL 2026 tests every kind of competitor. Fourteen modules, dozens of battles, one unforgettable day.
-                                </p>
-                                <p>
-                                    Whether a seasoned player or first-time participant — form your team, choose your arena, and write your chapter in IBA history.
-                                </p>
-                            </div>
-                        </div>
+                    <h2 style={{
+                        fontFamily: "'Russo One', sans-serif",
+                        fontSize: 'clamp(2.4rem,6vw,4rem)',
+                        background: 'linear-gradient(135deg, #F0EEFF 30%, #A855F7 70%, #00E5FF 100%)',
+                        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        textTransform: 'uppercase', lineHeight: 1.05,
+                        marginBottom: '40px',
+                    }}>
+                        About KGL
+                    </h2>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'clamp(24px,4vw,40px)' }}>
-                            {[
-                                { val: '14+', lbl: 'Events' },
-                                { val: '500+', lbl: 'Participants' },
-                                { val: '1', lbl: 'Epic Day' },
-                                { val: '∞', lbl: 'Memories' },
-                            ].map(({ val, lbl }) => (
-                                <div key={lbl} className="stat-item">
-                                    <div style={{ fontFamily: 'Russo One, sans-serif', fontSize: 'clamp(2.8rem,7vw,5rem)', background: 'linear-gradient(135deg, #00E5FF, #A855F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1 }}>{val}</div>
-                                    <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '.2em', textTransform: 'uppercase', color: '#8B8BAF', marginTop: '8px' }}>{lbl}</div>
-                                </div>
-                            ))}
-                        </div>
+                    <p style={{
+                        fontSize: 'clamp(14px,1.6vw,17px)', color: '#C4C4E0',
+                        lineHeight: 1.9, fontWeight: 300, maxWidth: '720px', margin: '0 auto 48px',
+                    }}>
+                        KGL is among the few competition series in Pakistan which happens on such a big scale.
+                        It is an Olympiad for holistic upbringing and development of individual talent. It invites
+                        the youth to celebrate their immense talent and nurture themselves immensely. It stands out
+                        because of the diverse opportunities that it offers in one package with a variety of{' '}
+                        <span style={{ color: '#00E5FF', fontWeight: 600 }}>20 competitions</span>. The categories
+                        are diversified in court games, field games, mind games and performing arts. With reaching
+                        a new height of{' '}
+                        <span style={{ color: '#00E5FF', fontWeight: 600 }}>1000+ participants</span>, KGL's team
+                        has proved that such drastic obstacles could not come in between what they promised and
+                        what they deliver.
+                    </p>
+
+                    {/* Stats row */}
+                    <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2px' }}>
+                        {[
+                            { val: '20+', lbl: 'Competitions' },
+                            { val: '1000+', lbl: 'Participants' },
+                            { val: '4', lbl: 'Categories' },
+                            { val: '1', lbl: 'Epic Day' },
+                        ].map(({ val, lbl }) => (
+                            <div key={lbl} style={{
+                                padding: 'clamp(20px,3vw,32px) clamp(24px,4vw,48px)',
+                                background: 'rgba(0,229,255,0.04)',
+                                border: '1px solid rgba(0,229,255,0.1)',
+                                flex: '1 0 120px', maxWidth: '220px',
+                            }}>
+                                <div style={{ fontFamily: "'Russo One', sans-serif", fontSize: 'clamp(2rem,5vw,3.2rem)', background: 'linear-gradient(135deg, #00E5FF, #A855F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1, marginBottom: '8px' }}>{val}</div>
+                                <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase', color: '#8B8BAF' }}>{lbl}</div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
