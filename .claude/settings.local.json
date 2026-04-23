@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/HA/.claude/**)",
+      "Read(//c/Users/HA/AppData/Roaming/**)",
+      "WebFetch(domain:enigmaiba.com)",
+      "Bash(python3 *)",
+      "Bash(py *)",
+      "Bash($PYTHON $SCRIPT *)",
+      "Read(//mnt/c/Career/**)",
+      "Bash(npm run *)",
+      "Read(//usr/**)",
+      "Bash(command -v python3)",
+      "Bash(/c/Users/HA/AppData/Local/Microsoft/WindowsApps/python3 \"C:/Users/HA/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.5.0/.claude/skills/ui-ux-pro-max/scripts/search.py\" \"holographic iridescent sports event premium dark\" --design-system -p \"Karachi Gala 2026\")",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git add *)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ],
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  }
+}
