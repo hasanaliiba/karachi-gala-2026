@@ -17,22 +17,14 @@ const MODULES = [
     { icon: Dumbbell, name: 'Arm Wrestling',desc: 'One-on-one raw power. Step up and show who has the strongest grip.' },
 ];
 
-const GALLERY = [
-    { label: 'Opening Ceremony',  wide: true,  grad: 'linear-gradient(135deg,#08071A,#1A0A3A)' },
-    { label: 'Chess Finals',      wide: false, grad: 'linear-gradient(135deg,#0A0820,#1C1050)' },
-    { label: 'FIFA Showdown',     wide: false, grad: 'linear-gradient(135deg,#060A1A,#0E1840)' },
-    { label: 'Cricket Match',     wide: false, grad: 'linear-gradient(135deg,#070E1A,#0A1E38)' },
-    { label: 'Badminton Court',   wide: false, grad: 'linear-gradient(135deg,#0D0820,#1A0A3A)' },
-    { label: 'Tug of War',        wide: false, grad: 'linear-gradient(135deg,#0A0818,#18083A)' },
-    { label: 'Award Ceremony',    wide: true,  grad: 'linear-gradient(135deg,#08071A,#200E50)' },
-    { label: 'Table Tennis',      wide: false, grad: 'linear-gradient(135deg,#060C1E,#0C1840)' },
-    { label: 'Carrom Battle',     wide: false, grad: 'linear-gradient(135deg,#0A0720,#160A3A)' },
-    { label: 'Closing Night',     wide: false, grad: 'linear-gradient(135deg,#050510,#120E30)' },
-    { label: 'Team Photos',       wide: false, grad: 'linear-gradient(135deg,#08081A,#14103A)' },
-];
 
 export default function Welcome() {
-    const { earlyBirdDate } = usePage<{ earlyBirdDate: string }>().props;
+    type GalleryItem = { id: number; label: string; image_url: string; wide: boolean; sort_order: number };
+
+    const { earlyBirdDate, galleryItems } = usePage<{
+        earlyBirdDate: string;
+        galleryItems: GalleryItem[];
+    }>().props;
     const [menuOpen, setMenuOpen]         = useState(false);
     const [scrolled, setScrolled]         = useState(false);
     const [hoveredMod, setHoveredMod]     = useState<number | null>(null);
@@ -563,15 +555,19 @@ export default function Welcome() {
                     </h2>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '8px' }}>
-                        {GALLERY.map(({ label, wide, grad }, i) => (
-                            <div key={i} className="gal-item"
-                                style={{ aspectRatio: wide ? '16/7' : '4/3', gridColumn: wide ? 'span 2' : undefined, background: grad }}
+                        {galleryItems.map((item, i) => (
+                            <div key={item.id} className="gal-item"
+                                style={{ aspectRatio: item.wide ? '16/7' : '4/3', gridColumn: item.wide ? 'span 2' : undefined }}
                                 onMouseEnter={() => setHoveredGal(i)}
                                 onMouseLeave={() => setHoveredGal(null)}
                             >
-                                <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(0,229,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.02) 1px,transparent 1px)', backgroundSize: '20px 20px' }} />
+                                <img
+                                    src={item.image_url}
+                                    alt={item.label}
+                                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
                                 <div className="gal-overlay" />
-                                <div className="gal-label">{label}</div>
+                                <div className="gal-label">{item.label}</div>
                                 <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: hoveredGal === i ? .3 : .08, transition: 'opacity .3s' }}>
                                     <Activity size={36} color="#00E5FF" />
                                 </div>
