@@ -32,17 +32,7 @@ export default function Welcome() {
     const [focusedField, setFocusedField] = useState<string | null>(null);
     const [form, setForm] = useState({ name: '', email: '', message: '' });
 
-    const EARLY_BIRD = new Date(earlyBirdDate + 'T00:00:00+05:00').getTime();
-    const calcTime = () => {
-        const diff = Math.max(0, EARLY_BIRD - Date.now());
-        return {
-            days:    Math.floor(diff / 86400000),
-            hours:   Math.floor((diff % 86400000) / 3600000),
-            minutes: Math.floor((diff % 3600000)  / 60000),
-            seconds: Math.floor((diff % 60000)    / 1000),
-        };
-    };
-    const [countdown, setCountdown] = useState(calcTime);
+    const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 60);
@@ -51,9 +41,20 @@ export default function Welcome() {
     }, []);
 
     useEffect(() => {
-        const id = setInterval(() => setCountdown(calcTime()), 1000);
+        const target = new Date(earlyBirdDate + 'T00:00:00+05:00').getTime();
+        const calc = () => {
+            const diff = Math.max(0, target - Date.now());
+            return {
+                days:    Math.floor(diff / 86400000),
+                hours:   Math.floor((diff % 86400000) / 3600000),
+                minutes: Math.floor((diff % 3600000)  / 60000),
+                seconds: Math.floor((diff % 60000)    / 1000),
+            };
+        };
+        setCountdown(calc());
+        const id = setInterval(() => setCountdown(calc()), 1000);
         return () => clearInterval(id);
-    }, []);
+    }, [earlyBirdDate]);
 
     const scrollTo = (id: string) => {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });

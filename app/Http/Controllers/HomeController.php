@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\GalleryItem;
 use App\Models\Setting;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -21,7 +20,7 @@ class HomeController extends Controller
                 ->map(fn (GalleryItem $item) => [
                     'id'         => $item->id,
                     'label'      => $item->label,
-                    'image_url'  => Storage::disk('public')->url($item->image_path),
+                    'image_url'  => '/storage/' . $item->image_path,
                     'wide'       => $item->wide,
                     'sort_order' => $item->sort_order,
                 ]),
