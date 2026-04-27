@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import {
     Menu, X, Instagram, Twitter, Facebook, Mail, Phone, MapPin,
@@ -32,6 +32,7 @@ const GALLERY = [
 ];
 
 export default function Welcome() {
+    const { earlyBirdDate } = usePage<{ earlyBirdDate: string }>().props;
     const [menuOpen, setMenuOpen]         = useState(false);
     const [scrolled, setScrolled]         = useState(false);
     const [hoveredMod, setHoveredMod]     = useState<number | null>(null);
@@ -39,8 +40,7 @@ export default function Welcome() {
     const [focusedField, setFocusedField] = useState<string | null>(null);
     const [form, setForm] = useState({ name: '', email: '', message: '' });
 
-    // Early bird deadline: 2 weeks before June 11 2026 = May 28 2026 00:00 PKT (UTC+5)
-    const EARLY_BIRD = new Date('2026-05-28T00:00:00+05:00').getTime();
+    const EARLY_BIRD = new Date(earlyBirdDate + 'T00:00:00+05:00').getTime();
     const calcTime = () => {
         const diff = Math.max(0, EARLY_BIRD - Date.now());
         return {
@@ -502,7 +502,13 @@ export default function Welcome() {
                         Early Bird <span style={{ color: '#00E5FF' }}>Ends In</span>
                     </h2>
                     <p style={{ fontSize: '13px', color: '#8B8BAF', letterSpacing: '.08em', marginBottom: '52px', fontWeight: 300 }}>
-                        Register before <span style={{ color: '#00E5FF' }}>May 28, 2026</span> to unlock early bird pricing
+                        Register before{' '}
+                        <span style={{ color: '#00E5FF' }}>
+                            {new Date(earlyBirdDate + 'T00:00:00+05:00').toLocaleDateString('en-US', {
+                                month: 'long', day: 'numeric', year: 'numeric',
+                            })}
+                        </span>{' '}
+                        to unlock early bird pricing
                     </p>
 
                     {countdown.days === 0 && countdown.hours === 0 && countdown.minutes === 0 && countdown.seconds === 0 ? (
