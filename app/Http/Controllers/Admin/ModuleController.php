@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Module;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,6 +23,7 @@ class ModuleController extends Controller
     {
         $data = $request->validate([
             'name'         => ['required', 'string', 'max:255'],
+            'image'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'intro'        => ['required', 'string'],
             'how_to_play'  => ['required', 'array', 'min:1'],
             'how_to_play.*'=> ['required', 'string', 'max:500'],
@@ -34,7 +36,11 @@ class ModuleController extends Controller
             'max_cap'      => ['required', 'integer', 'gte:min_cap'],
         ]);
 
+        $data['image_path'] = $request->hasFile('image')
+            ? $request->file('image')->store('modules', 'public')
+            : null;
         $data['sort_order'] = Module::max('sort_order') + 1;
+        unset($data['image']);
 
         Module::create($data);
 
@@ -45,6 +51,7 @@ class ModuleController extends Controller
     {
         $data = $request->validate([
             'name'         => ['required', 'string', 'max:255'],
+            'image'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
             'intro'        => ['required', 'string'],
             'how_to_play'  => ['required', 'array', 'min:1'],
             'how_to_play.*'=> ['required', 'string', 'max:500'],
@@ -57,6 +64,15 @@ class ModuleController extends Controller
             'max_cap'      => ['required', 'integer', 'gte:min_cap'],
         ]);
 
+        if ($request->hasFile('image')) {
+            if ($module->image_path) {
+                Storage::disk('public')->delete($module->image_path);
+            }
+
+            $data['image_path'] = $request->file('image')->store('modules', 'public');
+        }
+
+        unset($data['image']);
         $module->update($data);
 
         return back()->with('success', 'Module updated.');
@@ -64,6 +80,10 @@ class ModuleController extends Controller
 
     public function destroy(Module $module): RedirectResponse
     {
+        if ($module->image_path) {
+            Storage::disk('public')->delete($module->image_path);
+        }
+
         $module->delete();
 
         return back()->with('success', 'Module deleted.');

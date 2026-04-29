@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/spinner';
 type Module = {
     id: number;
     name: string;
+    image_path: string | null;
     intro: string;
     how_to_play: string[];
     rules: string;
@@ -21,6 +22,7 @@ type Module = {
 
 type FormData = {
     name: string;
+    image: File | null;
     intro: string;
     how_to_play: string[];
     rules: string;
@@ -33,6 +35,7 @@ type FormData = {
 
 const empty: FormData = {
     name: '',
+    image: null,
     intro: '',
     how_to_play: [''],
     rules: '',
@@ -113,6 +116,7 @@ function ModuleForm({
     function submit(e: React.FormEvent) {
         e.preventDefault();
         post(action, {
+            forceFormData: true,
             onSuccess: () => {
                 reset();
                 onSuccess?.();
@@ -132,6 +136,17 @@ function ModuleForm({
                     required
                 />
                 {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+            </div>
+
+            <div className="grid gap-1.5">
+                <Label htmlFor={`${action}-image`}>Module Image (JPG, PNG, WEBP - max 4 MB)</Label>
+                <Input
+                    id={`${action}-image`}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={e => setData('image', e.target.files?.[0] ?? null)}
+                />
+                {errors.image && <p className="text-sm text-red-500">{errors.image}</p>}
             </div>
 
             <div className="grid gap-1.5">
@@ -252,6 +267,7 @@ function EditPanel({ module, onClose }: { module: Module; onClose: () => void })
             <ModuleForm
                 defaults={{
                     name: module.name,
+                    image: null,
                     intro: module.intro,
                     how_to_play: module.how_to_play,
                     rules: module.rules,
@@ -339,6 +355,14 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                                 <Button size="sm" variant="ghost" onClick={() => move(index, 'down')} disabled={index === modules.length - 1} title="Move down">↓</Button>
                             </div>
                             <div className="flex-1">
+                                {module.image_path && (
+                                    <img
+                                        src={`/storage/${module.image_path}`}
+                                        alt={module.name}
+                                        className="mb-2 h-20 w-32 rounded object-cover"
+                                        style={{ background: 'rgba(0,229,255,0.05)' }}
+                                    />
+                                )}
                                 <p className="font-medium">{module.name}</p>
                                 <p className="mt-0.5 text-sm line-clamp-2" style={{ color: '#8B8BAF' }}>{module.intro}</p>
                                 <div className="mt-2 flex flex-wrap gap-3 text-xs" style={{ color: '#8B8BAF' }}>

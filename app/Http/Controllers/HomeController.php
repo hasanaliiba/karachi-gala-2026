@@ -30,6 +30,7 @@ class HomeController extends Controller
                 ->map(fn (Module $m) => [
                     'id'           => $m->id,
                     'name'         => $m->name,
+                    'image_url'    => $m->image_path ? '/storage/' . $m->image_path : null,
                     'intro'        => $m->intro,
                     'how_to_play'  => $m->how_to_play,
                     'rules'        => $m->rules,
