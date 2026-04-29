@@ -6,24 +6,34 @@ import {
     Activity, Users, Dumbbell, ArrowRight,
 } from 'lucide-react';
 
-const MODULES = [
-    { icon: Crown,    name: 'Chess',        desc: 'Strategic minds clash on 64 squares. Prove your intellect and foresight under pressure.' },
-    { icon: Gamepad2, name: 'FIFA',         desc: 'Take to the virtual pitch — console gaming at its most competitive level.' },
-    { icon: Target,   name: 'Carrom',       desc: 'A test of precision and steady hands. Pocket your way to victory.' },
-    { icon: Zap,      name: 'Table Tennis', desc: 'Fast reflexes and sharp serves. Every single rally counts in this sport.' },
-    { icon: Wind,     name: 'Badminton',    desc: 'Court battles of speed and stamina. Smash your way to the championship.' },
-    { icon: Activity, name: 'Cricket',      desc: 'Bat, bowl, or field — cricket brings out the team spirit in every participant.' },
-    { icon: Users,    name: 'Tug of War',   desc: 'Pull together as one. Pure strength and unity determine who wins.' },
-    { icon: Dumbbell, name: 'Arm Wrestling',desc: 'One-on-one raw power. Step up and show who has the strongest grip.' },
-];
+const MODULE_ICONS: Record<string, React.ElementType> = {
+    'chess':        Crown,
+    'fifa':         Gamepad2,
+    'carrom':       Target,
+    'table tennis': Zap,
+    'badminton':    Wind,
+    'cricket':      Activity,
+    'tug of war':   Users,
+    'arm wrestling':Dumbbell,
+};
+
+function moduleIcon(name: string): React.ElementType {
+    return MODULE_ICONS[name.toLowerCase()] ?? Gamepad2;
+}
 
 
 export default function Welcome() {
     type GalleryItem = { id: number; label: string; image_url: string; wide: boolean; sort_order: number };
+    type Module = {
+        id: number; name: string; intro: string;
+        how_to_play: string[]; rules: string; registration: string[];
+        first_prize: string; second_prize: string; min_cap: number; max_cap: number;
+    };
 
-    const { earlyBirdDate, galleryItems } = usePage<{
+    const { earlyBirdDate, galleryItems, modules } = usePage<{
         earlyBirdDate: string;
         galleryItems: GalleryItem[];
+        modules: Module[];
     }>().props;
     const [menuOpen, setMenuOpen]         = useState(false);
     const [scrolled, setScrolled]         = useState(false);
@@ -592,18 +602,24 @@ export default function Welcome() {
                     </p>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,240px),1fr))', gap: '2px' }}>
-                        {MODULES.map(({ icon: Icon, name, desc }, i) => (
-                            <div key={name} className="mod-card"
-                                onMouseEnter={() => setHoveredMod(i)}
-                                onMouseLeave={() => setHoveredMod(null)}
-                            >
-                                <span className="mod-num">0{i + 1}</span>
-                                <div className="mod-icon"><Icon size={28} /></div>
-                                <div className="mod-name">{name}</div>
-                                <div className="mod-desc">{desc}</div>
-                                <div className="mod-cta">Register <ArrowRight size={11} /></div>
-                            </div>
-                        ))}
+                        {modules.map((mod, i) => {
+                            const Icon = moduleIcon(mod.name);
+                            return (
+                                <div key={mod.id} className="mod-card"
+                                    onMouseEnter={() => setHoveredMod(i)}
+                                    onMouseLeave={() => setHoveredMod(null)}
+                                >
+                                    <span className="mod-num">{String(i + 1).padStart(2, '0')}</span>
+                                    <div className="mod-icon"><Icon size={28} /></div>
+                                    <div className="mod-name">{mod.name}</div>
+                                    <div className="mod-desc">{mod.intro}</div>
+                                    <div style={{ marginTop: '12px', display: 'flex', gap: '12px', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
+                                        <span style={{ fontSize: '10px', letterSpacing: '.1em', color: 'rgba(0,229,255,0.6)' }}>🏆 {mod.first_prize}</span>
+                                    </div>
+                                    <div className="mod-cta">Register <ArrowRight size={11} /></div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
