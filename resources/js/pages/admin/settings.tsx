@@ -25,13 +25,19 @@ export default function AdminSettings({ earlyBirdDate }: Props) {
             <Head title="Admin Settings" />
 
             <div className="max-w-lg">
-                <h1 className="mb-1 text-2xl font-semibold">Settings</h1>
-                <p className="mb-8 text-sm text-gray-500">
+                <h1 className="mb-1 text-2xl font-semibold" style={{ fontFamily: 'Russo One, sans-serif', letterSpacing: '.04em', textTransform: 'uppercase' }}>Settings</h1>
+                <p className="mb-8 text-sm" style={{ color: '#8B8BAF' }}>
                     Update site-wide configuration for Karachi Gala League 2026.
                 </p>
 
                 {props.flash?.success && (
-                    <div className="mb-6 rounded-md bg-green-50 px-4 py-3 text-sm text-green-700">
+                    <div className="mb-6 px-4 py-3 text-sm" style={{
+                        background: 'rgba(52,211,153,0.08)',
+                        color: '#4ade80',
+                        border: '1px solid rgba(52,211,153,0.2)',
+                        borderLeft: '3px solid #4ade80',
+                        borderRadius: '4px',
+                    }}>
                         {props.flash.success}
                     </div>
                 )}
@@ -39,7 +45,7 @@ export default function AdminSettings({ earlyBirdDate }: Props) {
                 <form onSubmit={submit} className="flex flex-col gap-6">
                     <div className="grid gap-1.5">
                         <Label htmlFor="early_bird_date">Early Bird Deadline</Label>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs" style={{ color: '#8B8BAF' }}>
                             The countdown on the public home page counts down to this date (midnight PKT, UTC+5).
                         </p>
                         <Input

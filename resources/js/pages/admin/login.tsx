@@ -18,13 +18,56 @@ export default function AdminLogin() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+        <div className="admin-dark" style={{
+            display: 'flex',
+            minHeight: '100vh',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#08071A',
+            color: '#F0EEFF',
+            fontFamily: "'Chakra Petch', sans-serif",
+            padding: '16px',
+        }}>
             <Head title="Admin Login" />
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Chakra+Petch:wght@300;400;500;600;700&display=swap');
+                .admin-dark {
+                    --background: #0D0C25;
+                    --foreground: #F0EEFF;
+                    --primary: #00E5FF;
+                    --primary-foreground: #08071A;
+                    --muted-foreground: #8B8BAF;
+                    --accent: rgba(0,229,255,0.12);
+                    --accent-foreground: #F0EEFF;
+                    --border: rgba(0,229,255,0.18);
+                    --input: rgba(0,229,255,0.15);
+                    --ring: rgba(0,229,255,0.4);
+                    font-family: 'Chakra Petch', sans-serif;
+                }
+            `}</style>
 
-            <div className="w-full max-w-sm rounded-xl border bg-white p-8 shadow-sm">
-                <div className="mb-6 text-center">
-                    <h1 className="text-xl font-semibold">KGL Admin</h1>
-                    <p className="mt-1 text-sm text-gray-500">Sign in to your admin account</p>
+            <div style={{
+                width: '100%',
+                maxWidth: '384px',
+                background: '#13123A',
+                borderTop: '2px solid rgba(0,229,255,0.3)',
+                padding: '36px 32px',
+                boxShadow: '0 0 60px rgba(0,229,255,0.06), 0 0 120px rgba(168,85,247,0.04)',
+            }}>
+                <div style={{ marginBottom: '28px', textAlign: 'center' }}>
+                    <h1 style={{
+                        fontFamily: 'Russo One, sans-serif',
+                        fontSize: '26px',
+                        letterSpacing: '.08em',
+                        background: 'linear-gradient(135deg, #00E5FF, #A855F7)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        textTransform: 'uppercase',
+                    }}>KGL Admin</h1>
+                    <p style={{ marginTop: '8px', fontSize: '13px', color: '#8B8BAF', letterSpacing: '.04em' }}>
+                        Sign in to your admin account
+                    </p>
                 </div>
 
                 <form onSubmit={submit} className="flex flex-col gap-4">

@@ -74,7 +74,7 @@ function BulletListEditor({
             <div className="flex flex-col gap-2">
                 {items.map((item, i) => (
                     <div key={i} className="flex gap-2">
-                        <span className="mt-2 text-gray-400 text-sm">•</span>
+                        <span className="mt-2 text-sm" style={{ color: '#8B8BAF' }}>•</span>
                         <Input
                             value={item}
                             onChange={e => update(i, e.target.value)}
@@ -88,7 +88,7 @@ function BulletListEditor({
                         )}
                     </div>
                 ))}
-                <Button type="button" size="sm" variant="ghost" className="self-start text-gray-500" onClick={add}>
+                <Button type="button" size="sm" variant="ghost" className="self-start" style={{ color: '#8B8BAF' }} onClick={add}>
                     + Add point
                 </Button>
             </div>
@@ -242,9 +242,11 @@ function ModuleForm({
 
 function EditPanel({ module, onClose }: { module: Module; onClose: () => void }) {
     return (
-        <div className="border-t bg-gray-50 p-6">
+        <div className="p-6" style={{ borderTop: '1px solid rgba(0,229,255,0.1)', background: 'rgba(0,0,0,0.2)' }}>
             <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-medium">Edit — {module.name}</h3>
+                <h3 className="font-medium" style={{ color: '#00E5FF', fontSize: '12px', letterSpacing: '.1em', textTransform: 'uppercase' }}>
+                    Edit — {module.name}
+                </h3>
                 <Button size="sm" variant="ghost" onClick={onClose}>Close</Button>
             </div>
             <ModuleForm
@@ -290,8 +292,8 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
 
             <div className="mb-8 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold">Modules</h1>
-                    <p className="mt-1 text-sm text-gray-500">Manage game/activity modules shown on the public site.</p>
+                    <h1 className="text-2xl font-semibold" style={{ fontFamily: 'Russo One, sans-serif', letterSpacing: '.04em', textTransform: 'uppercase' }}>Modules</h1>
+                    <p className="mt-1 text-sm" style={{ color: '#8B8BAF' }}>Manage game/activity modules shown on the public site.</p>
                 </div>
                 <Button onClick={() => setShowAdd(v => !v)}>
                     {showAdd ? 'Cancel' : '+ Add Module'}
@@ -299,14 +301,23 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
             </div>
 
             {props.flash?.success && (
-                <div className="mb-6 rounded-md bg-green-50 px-4 py-3 text-sm text-green-700">
+                <div className="mb-6 px-4 py-3 text-sm" style={{
+                    background: 'rgba(52,211,153,0.08)',
+                    color: '#4ade80',
+                    border: '1px solid rgba(52,211,153,0.2)',
+                    borderLeft: '3px solid #4ade80',
+                    borderRadius: '4px',
+                }}>
                     {props.flash.success}
                 </div>
             )}
 
             {showAdd && (
-                <div className="mb-8 rounded-lg border bg-white p-6">
-                    <h2 className="mb-4 text-lg font-medium">New Module</h2>
+                <div className="mb-8 p-6" style={{
+                    background: '#13123A',
+                    borderTop: '2px solid rgba(0,229,255,0.2)',
+                }}>
+                    <h2 className="mb-4" style={{ fontFamily: 'Russo One, sans-serif', fontSize: '14px', letterSpacing: '.06em', textTransform: 'uppercase', color: '#00E5FF' }}>New Module</h2>
                     <ModuleForm
                         defaults={empty}
                         action="/admin/modules"
@@ -316,12 +327,12 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                 </div>
             )}
 
-            <div className="rounded-lg border bg-white">
+            <div style={{ background: '#13123A', border: '1px solid rgba(0,229,255,0.1)', borderRadius: '8px' }}>
                 {modules.length === 0 && (
-                    <p className="p-6 text-sm text-gray-400">No modules yet. Add one above.</p>
+                    <p className="p-6 text-sm" style={{ color: '#8B8BAF' }}>No modules yet. Add one above.</p>
                 )}
                 {modules.map((module, index) => (
-                    <div key={module.id} className="border-b last:border-0">
+                    <div key={module.id} style={{ borderBottom: index < modules.length - 1 ? '1px solid rgba(0,229,255,0.08)' : 'none' }}>
                         <div className="flex items-start gap-4 p-4">
                             <div className="flex flex-col gap-1">
                                 <Button size="sm" variant="ghost" onClick={() => move(index, 'up')} disabled={index === 0} title="Move up">↑</Button>
@@ -329,8 +340,8 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                             </div>
                             <div className="flex-1">
                                 <p className="font-medium">{module.name}</p>
-                                <p className="mt-0.5 text-sm text-gray-500 line-clamp-2">{module.intro}</p>
-                                <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-500">
+                                <p className="mt-0.5 text-sm line-clamp-2" style={{ color: '#8B8BAF' }}>{module.intro}</p>
+                                <div className="mt-2 flex flex-wrap gap-3 text-xs" style={{ color: '#8B8BAF' }}>
                                     <span>🏆 {module.first_prize}</span>
                                     <span>🥈 {module.second_prize}</span>
                                     <span>👥 {module.min_cap}–{module.max_cap} participants</span>

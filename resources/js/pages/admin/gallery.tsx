@@ -30,45 +30,47 @@ function AddForm() {
     }
 
     return (
-        <form onSubmit={submit} className="mb-8 rounded-lg border bg-white p-6">
-            <h2 className="mb-4 text-lg font-medium">Add Image</h2>
-            <div className="flex flex-col gap-4">
-                <div className="grid gap-1.5">
-                    <Label htmlFor="add-label">Label</Label>
-                    <Input
-                        id="add-label"
-                        value={data.label}
-                        onChange={e => setData('label', e.target.value)}
-                        placeholder="e.g. Opening Ceremony"
-                        required
-                    />
-                    {errors.label && <p className="text-sm text-red-500">{errors.label}</p>}
-                </div>
-                <div className="grid gap-1.5">
-                    <Label htmlFor="add-image">Image (JPG, PNG, WEBP — max 4 MB)</Label>
-                    <Input
-                        id="add-image"
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        onChange={e => setData('image', e.target.files?.[0] ?? null)}
-                        required
-                    />
-                    {errors.image && <p className="text-sm text-red-500">{errors.image}</p>}
-                </div>
-                <div className="flex items-center gap-2">
-                    <Checkbox
-                        id="add-wide"
-                        checked={data.wide}
-                        onCheckedChange={v => setData('wide', Boolean(v))}
-                    />
-                    <Label htmlFor="add-wide">Wide (spans 2 columns in gallery)</Label>
-                </div>
-                <div>
-                    <Button type="submit" disabled={processing}>
-                        {processing && <Spinner />}
-                        Add Image
-                    </Button>
-                </div>
+        <form onSubmit={submit} className="mb-8 flex flex-col gap-4" style={{
+            background: '#13123A',
+            borderTop: '2px solid rgba(0,229,255,0.2)',
+            padding: '24px',
+        }}>
+            <h2 className="text-lg font-medium" style={{ fontFamily: 'Russo One, sans-serif', letterSpacing: '.04em', textTransform: 'uppercase', fontSize: '14px', color: '#00E5FF' }}>Add Image</h2>
+            <div className="grid gap-1.5">
+                <Label htmlFor="add-label">Label</Label>
+                <Input
+                    id="add-label"
+                    value={data.label}
+                    onChange={e => setData('label', e.target.value)}
+                    placeholder="e.g. Opening Ceremony"
+                    required
+                />
+                {errors.label && <p className="text-sm text-red-500">{errors.label}</p>}
+            </div>
+            <div className="grid gap-1.5">
+                <Label htmlFor="add-image">Image (JPG, PNG, WEBP — max 4 MB)</Label>
+                <Input
+                    id="add-image"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={e => setData('image', e.target.files?.[0] ?? null)}
+                    required
+                />
+                {errors.image && <p className="text-sm text-red-500">{errors.image}</p>}
+            </div>
+            <div className="flex items-center gap-2">
+                <Checkbox
+                    id="add-wide"
+                    checked={data.wide}
+                    onCheckedChange={v => setData('wide', Boolean(v))}
+                />
+                <Label htmlFor="add-wide">Wide (spans 2 columns in gallery)</Label>
+            </div>
+            <div>
+                <Button type="submit" disabled={processing}>
+                    {processing && <Spinner />}
+                    Add Image
+                </Button>
             </div>
         </form>
     );
@@ -145,29 +147,36 @@ export default function AdminGallery({ items }: { items: GalleryItem[] }) {
         <>
             <Head title="Gallery Management" />
 
-            <h1 className="mb-1 text-2xl font-semibold">Gallery</h1>
-            <p className="mb-8 text-sm text-gray-500">
+            <h1 className="mb-1 text-2xl font-semibold" style={{ fontFamily: 'Russo One, sans-serif', letterSpacing: '.04em', textTransform: 'uppercase' }}>Gallery</h1>
+            <p className="mb-8 text-sm" style={{ color: '#8B8BAF' }}>
                 Manage images shown in the gallery section of the public home page.
             </p>
 
             {props.flash?.success && (
-                <div className="mb-6 rounded-md bg-green-50 px-4 py-3 text-sm text-green-700">
+                <div className="mb-6 px-4 py-3 text-sm" style={{
+                    background: 'rgba(52,211,153,0.08)',
+                    color: '#4ade80',
+                    border: '1px solid rgba(52,211,153,0.2)',
+                    borderLeft: '3px solid #4ade80',
+                    borderRadius: '4px',
+                }}>
                     {props.flash.success}
                 </div>
             )}
 
             <AddForm />
 
-            <div className="rounded-lg border bg-white">
+            <div style={{ background: '#13123A', border: '1px solid rgba(0,229,255,0.1)', borderRadius: '8px' }}>
                 {items.length === 0 && (
-                    <p className="p-6 text-sm text-gray-400">No gallery images yet. Add one above.</p>
+                    <p className="p-6 text-sm" style={{ color: '#8B8BAF' }}>No gallery images yet. Add one above.</p>
                 )}
                 {items.map((item, index) => (
-                    <div key={item.id} className="flex items-start gap-4 border-b p-4 last:border-0">
+                    <div key={item.id} className="flex items-start gap-4 p-4" style={{ borderBottom: index < items.length - 1 ? '1px solid rgba(0,229,255,0.08)' : 'none' }}>
                         <img
                             src={`/storage/${item.image_path}`}
                             alt={item.label}
-                            className="h-16 w-24 shrink-0 rounded object-cover bg-gray-100"
+                            className="h-16 w-24 shrink-0 rounded object-cover"
+                            style={{ background: 'rgba(0,229,255,0.05)' }}
                         />
                         {editingId === item.id ? (
                             <EditForm item={item} onCancel={() => setEditingId(null)} />
@@ -176,7 +185,12 @@ export default function AdminGallery({ items }: { items: GalleryItem[] }) {
                                 <div>
                                     <p className="font-medium">{item.label}</p>
                                     {item.wide && (
-                                        <span className="mt-1 inline-block rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-600">
+                                        <span className="mt-1 inline-block px-2 py-0.5 text-xs" style={{
+                                            background: 'rgba(0,229,255,0.1)',
+                                            color: '#00E5FF',
+                                            border: '1px solid rgba(0,229,255,0.2)',
+                                            borderRadius: '4px',
+                                        }}>
                                             Wide
                                         </span>
                                     )}
