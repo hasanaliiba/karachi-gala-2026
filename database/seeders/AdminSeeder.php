@@ -23,5 +23,10 @@ class AdminSeeder extends Seeder
             ['key' => 'early_bird_date'],
             ['value' => '2026-05-28']
         );
+
+        Setting::firstOrCreate(
+            ['key' => 'early_bird_enabled'],
+            ['value' => '0']
+        );
     }
 }

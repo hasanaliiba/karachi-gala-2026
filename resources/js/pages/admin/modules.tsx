@@ -13,6 +13,8 @@ type Module = {
     how_to_play: string[];
     rules: string;
     registration: string[];
+    early_bird_price: string;
+    normal_price: string;
     first_prize: string;
     second_prize: string;
     min_cap: number;
@@ -27,6 +29,8 @@ type FormData = {
     how_to_play: string[];
     rules: string;
     registration: string[];
+    early_bird_price: string;
+    normal_price: string;
     first_prize: string;
     second_prize: string;
     min_cap: number | '';
@@ -40,6 +44,8 @@ const empty: FormData = {
     how_to_play: [''],
     rules: '',
     registration: [''],
+    early_bird_price: '',
+    normal_price: '',
     first_prize: '',
     second_prize: '',
     min_cap: '',
@@ -193,6 +199,31 @@ function ModuleForm({
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-1.5">
+                    <Label htmlFor={`${action}-early-bird`}>Early Bird Price</Label>
+                    <Input
+                        id={`${action}-early-bird`}
+                        value={data.early_bird_price}
+                        onChange={e => setData('early_bird_price', e.target.value)}
+                        placeholder="e.g. PKR 3000"
+                        required
+                    />
+                    {errors.early_bird_price && <p className="text-sm text-red-500">{errors.early_bird_price}</p>}
+                </div>
+                <div className="grid gap-1.5">
+                    <Label htmlFor={`${action}-normal`}>Normal Price</Label>
+                    <Input
+                        id={`${action}-normal`}
+                        value={data.normal_price}
+                        onChange={e => setData('normal_price', e.target.value)}
+                        placeholder="e.g. PKR 4000"
+                        required
+                    />
+                    {errors.normal_price && <p className="text-sm text-red-500">{errors.normal_price}</p>}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-1.5">
                     <Label htmlFor={`${action}-first`}>1st Prize</Label>
                     <Input
                         id={`${action}-first`}
@@ -272,6 +303,8 @@ function EditPanel({ module, onClose }: { module: Module; onClose: () => void })
                     how_to_play: module.how_to_play,
                     rules: module.rules,
                     registration: module.registration,
+                    early_bird_price: module.early_bird_price,
+                    normal_price: module.normal_price,
                     first_prize: module.first_prize,
                     second_prize: module.second_prize,
                     min_cap: module.min_cap,
@@ -366,6 +399,7 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                                 <p className="font-medium">{module.name}</p>
                                 <p className="mt-0.5 text-sm line-clamp-2" style={{ color: '#8B8BAF' }}>{module.intro}</p>
                                 <div className="mt-2 flex flex-wrap gap-3 text-xs" style={{ color: '#8B8BAF' }}>
+                                    <span>💸 {module.early_bird_price} (Early) / {module.normal_price} (Normal)</span>
                                     <span>🏆 {module.first_prize}</span>
                                     <span>🥈 {module.second_prize}</span>
                                     <span>👥 {module.min_cap}–{module.max_cap} participants</span>

@@ -15,6 +15,7 @@ class SettingsController extends Controller
     {
         return Inertia::render('admin/settings', [
             'earlyBirdDate' => Setting::get('early_bird_date', '2026-05-28'),
+            'earlyBirdEnabled' => Setting::get('early_bird_enabled', '0') === '1',
         ]);
     }
 
@@ -22,11 +23,16 @@ class SettingsController extends Controller
     {
         $request->validate([
             'early_bird_date' => ['required', 'date_format:Y-m-d'],
+            'early_bird_enabled' => ['required', 'boolean'],
         ]);
 
         Setting::updateOrCreate(
             ['key' => 'early_bird_date'],
             ['value' => $request->early_bird_date]
+        );
+        Setting::updateOrCreate(
+            ['key' => 'early_bird_enabled'],
+            ['value' => $request->boolean('early_bird_enabled') ? '1' : '0']
         );
 
         return back()->with('success', 'Settings saved.');

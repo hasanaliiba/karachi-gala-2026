@@ -16,6 +16,7 @@ class HomeController extends Controller
         return Inertia::render('welcome', [
             'canRegister'   => Features::enabled(Features::registration()),
             'earlyBirdDate' => Setting::get('early_bird_date', '2026-05-28'),
+            'earlyBirdEnabled' => Setting::get('early_bird_enabled', '0') === '1',
             'galleryItems'  => GalleryItem::orderBy('sort_order')
                 ->get()
                 ->map(fn (GalleryItem $item) => [
@@ -35,6 +36,8 @@ class HomeController extends Controller
                     'how_to_play'  => $m->how_to_play,
                     'rules'        => $m->rules,
                     'registration' => $m->registration,
+                    'early_bird_price' => $m->early_bird_price,
+                    'normal_price' => $m->normal_price,
                     'first_prize'  => $m->first_prize,
                     'second_prize' => $m->second_prize,
                     'min_cap'      => $m->min_cap,

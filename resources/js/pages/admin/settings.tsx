@@ -1,18 +1,21 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 
 type Props = {
     earlyBirdDate: string;
+    earlyBirdEnabled: boolean;
 };
 
-export default function AdminSettings({ earlyBirdDate }: Props) {
+export default function AdminSettings({ earlyBirdDate, earlyBirdEnabled }: Props) {
     const { props } = usePage<{ flash?: { success?: string } }>();
 
     const { data, setData, patch, processing, errors } = useForm({
         early_bird_date: earlyBirdDate,
+        early_bird_enabled: earlyBirdEnabled,
     });
 
     function submit(e: React.FormEvent) {
@@ -57,6 +60,23 @@ export default function AdminSettings({ earlyBirdDate }: Props) {
                         />
                         {errors.early_bird_date && (
                             <p className="text-sm text-red-500">{errors.early_bird_date}</p>
+                        )}
+                    </div>
+
+                    <div className="grid gap-1.5">
+                        <div className="flex items-center gap-2">
+                            <Checkbox
+                                id="early_bird_enabled"
+                                checked={data.early_bird_enabled}
+                                onCheckedChange={v => setData('early_bird_enabled', Boolean(v))}
+                            />
+                            <Label htmlFor="early_bird_enabled">Enable early bird discount on welcome page</Label>
+                        </div>
+                        <p className="text-xs" style={{ color: '#8B8BAF' }}>
+                            When disabled, only normal module prices are shown on the welcome page.
+                        </p>
+                        {errors.early_bird_enabled && (
+                            <p className="text-sm text-red-500">{errors.early_bird_enabled}</p>
                         )}
                     </div>
 

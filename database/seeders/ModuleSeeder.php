@@ -24,6 +24,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '4000 rs',
                 ],
+                'early_bird_price' => '4000 rs',
+                'normal_price' => '4000 rs',
                 'first_prize'  => '12000 rs',
                 'second_prize' => '8000 rs',
                 'min_cap' => 8,
@@ -113,6 +115,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '2000 rs',
                 ],
+                'early_bird_price' => '2000 rs',
+                'normal_price' => '2000 rs',
                 'first_prize'  => '15000 rs',
                 'second_prize' => '10000 rs',
                 'min_cap' => 16,
@@ -132,6 +136,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '1000 rs',
                 ],
+                'early_bird_price' => '1000 rs',
+                'normal_price' => '1000 rs',
                 'first_prize'  => '5000',
                 'second_prize' => '2500',
                 'min_cap' => 10,
@@ -150,6 +156,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '1000 rs',
                 ],
+                'early_bird_price' => '1000 rs',
+                'normal_price' => '1000 rs',
                 'first_prize'  => '5000 rs',
                 'second_prize' => '2500 rs',
                 'min_cap' => 10,
@@ -166,6 +174,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '6000 rs',
                 ],
+                'early_bird_price' => '6000 rs',
+                'normal_price' => '6000 rs',
                 'first_prize'  => '50,000',
                 'second_prize' => '30,000',
                 'min_cap' => 25,
@@ -181,6 +191,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '8000rs',
                 ],
+                'early_bird_price' => '8000rs',
+                'normal_price' => '8000rs',
                 'first_prize'  => 'TBD',
                 'second_prize' => 'TBD',
                 'min_cap' => 25,
@@ -196,6 +208,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '8000rs',
                 ],
+                'early_bird_price' => '8000rs',
+                'normal_price' => '8000rs',
                 'first_prize'  => 'TBD',
                 'second_prize' => 'TBD',
                 'min_cap' => 5,
@@ -211,6 +225,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '2500rs',
                 ],
+                'early_bird_price' => '2500rs',
+                'normal_price' => '2500rs',
                 'first_prize'  => 'TBD',
                 'second_prize' => 'TBD',
                 'min_cap' => 10,
@@ -226,6 +242,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '8000rs',
                 ],
+                'early_bird_price' => '8000rs',
+                'normal_price' => '8000rs',
                 'first_prize'  => 'TBD',
                 'second_prize' => 'TBD',
                 'min_cap' => 8,
@@ -241,6 +259,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '6000rs',
                 ],
+                'early_bird_price' => '6000rs',
+                'normal_price' => '6000rs',
                 'first_prize'  => 'TBD',
                 'second_prize' => 'TBD',
                 'min_cap' => 7,
@@ -256,6 +276,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '1000rs',
                 ],
+                'early_bird_price' => '1000rs',
+                'normal_price' => '1000rs',
                 'first_prize'  => 'TBD',
                 'second_prize' => 'TBD',
                 'min_cap' => 10,
@@ -277,6 +299,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '1000 rs',
                 ],
+                'early_bird_price' => '1000 rs',
+                'normal_price' => '1000 rs',
                 'first_prize'  => '5000 rs',
                 'second_prize' => '2500 rs',
                 'min_cap' => 10,
@@ -297,6 +321,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '1500 rs',
                 ],
+                'early_bird_price' => '1500 rs',
+                'normal_price' => '1500 rs',
                 'first_prize'  => '10000 rs',
                 'second_prize' => '6000 rs',
                 'min_cap' => 20,
@@ -316,6 +342,8 @@ class ModuleSeeder extends Seeder
                 'registration' => [
                     '1000rs',
                 ],
+                'early_bird_price' => '1000rs',
+                'normal_price' => '1000rs',
                 'first_prize'  => 'PKR 12,000 + Trophy',
                 'second_prize' => 'PKR 6,000 + Medal',
                 'min_cap' => 10,
@@ -337,6 +365,8 @@ class ModuleSeeder extends Seeder
                     'Team captain must submit the final roster 30 minutes before the event.',
                     'Mixed-gender teams are welcome.',
                 ],
+                'early_bird_price' => 'TBD',
+                'normal_price' => 'TBD',
                 'first_prize'  => 'PKR 25,000 + Trophy',
                 'second_prize' => 'PKR 12,000 + Medal',
                 'min_cap' => 4,
@@ -357,6 +387,8 @@ class ModuleSeeder extends Seeder
                     'Register as an individual player.',
                     'Players must report to the carrom area 10 minutes before their scheduled match.',
                 ],
+                'early_bird_price' => 'TBD',
+                'normal_price' => 'TBD',
                 'first_prize'  => 'PKR 10,000 + Trophy',
                 'second_prize' => 'PKR 5,000 + Medal',
                 'min_cap' => 8,
@@ -365,7 +397,7 @@ class ModuleSeeder extends Seeder
         ];
 
         foreach ($modules as $order => $module) {
-            Module::firstOrCreate(
+            Module::updateOrCreate(
                 ['name' => $module['name']],
                 array_merge($module, ['sort_order' => $order])
             );

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import {
     Menu, X, Instagram, Twitter, Facebook, Mail, Phone, MapPin,
     Send, ChevronDown, Crown, Gamepad2, Target, Zap, Wind,
-    Activity, Users, Dumbbell, ArrowRight,
+    Activity, Users, Dumbbell, ArrowRight, ShoppingCart,
 } from 'lucide-react';
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
@@ -26,12 +26,16 @@ export default function Welcome() {
     type GalleryItem = { id: number; label: string; image_url: string; wide: boolean; sort_order: number };
     type Module = {
         id: number; name: string; intro: string;
+        image_url: string | null;
         how_to_play: string[]; rules: string; registration: string[];
+        early_bird_price: string | null;
+        normal_price: string | null;
         first_prize: string; second_prize: string; min_cap: number; max_cap: number;
     };
 
-    const { earlyBirdDate, galleryItems, modules } = usePage<{
+    const { earlyBirdDate, earlyBirdEnabled, galleryItems, modules } = usePage<{
         earlyBirdDate: string;
+        earlyBirdEnabled: boolean;
         galleryItems: GalleryItem[];
         modules: Module[];
     }>().props;
@@ -251,40 +255,113 @@ export default function Welcome() {
 
                 /* Module cards */
                 .mod-card {
-                    background: var(--s2); border-top: 2px solid rgba(0,229,255,0.15);
-                    padding: clamp(20px,3vw,32px); cursor: pointer; transition: all .25s ease;
-                    position: relative; overflow: hidden;
+                    background: linear-gradient(180deg, rgba(19,18,58,0.95) 0%, rgba(13,12,37,0.98) 100%);
+                    border: 1px solid rgba(0,229,255,0.2);
+                    border-radius: 18px;
+                    padding: 14px;
+                    cursor: pointer;
+                    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+                    position: relative;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
                 }
-                .mod-card::before {
-                    content: ''; position: absolute; inset: 0;
-                    background: linear-gradient(135deg, rgba(0,229,255,0.08), rgba(168,85,247,0.12), rgba(255,110,180,0.08));
-                    opacity: 0; transition: opacity .25s;
+                .mod-card:hover {
+                    border-color: rgba(0,229,255,0.55);
+                    transform: translateY(-2px);
+                    box-shadow: 0 12px 32px rgba(0,229,255,0.12), 0 8px 24px rgba(168,85,247,0.12);
                 }
-                .mod-card:hover { border-top-color: var(--c); }
-                .mod-card:hover::before { opacity: 1; }
-                .mod-card:hover .mod-icon { color: var(--c2); }
-                .mod-card:hover .mod-name { color: var(--c); }
-                .mod-icon { color: var(--c); margin-bottom: 16px; transition: color .25s; position: relative; z-index: 1; }
+                .mod-cover {
+                    width: 100%;
+                    aspect-ratio: 16/9;
+                    object-fit: cover;
+                    border-radius: 12px;
+                    display: block;
+                    margin-bottom: 14px;
+                    background: linear-gradient(135deg, rgba(217,70,239,0.18), rgba(0,229,255,0.1));
+                    border: 1px solid rgba(0,229,255,0.16);
+                }
+                .mod-cover-fallback {
+                    width: 100%;
+                    aspect-ratio: 16/9;
+                    border-radius: 12px;
+                    margin-bottom: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: linear-gradient(135deg, rgba(168,85,247,0.22), rgba(0,229,255,0.12));
+                    border: 1px solid rgba(0,229,255,0.16);
+                }
+                .mod-icon { color: #E9E7FF; transition: color .25s; }
                 .mod-name {
                     font-family: 'Russo One', sans-serif; font-size: 18px;
-                    color: var(--text); margin-bottom: 8px; text-transform: uppercase;
+                    color: var(--text); margin-bottom: 10px; text-transform: none;
                     transition: color .25s; position: relative; z-index: 1;
                 }
-                .mod-desc { font-size: 12px; color: var(--dim); line-height: 1.75; font-weight: 300; transition: color .25s; position: relative; z-index: 1; }
-                .mod-card:hover .mod-desc { color: rgba(176,176,220,0.8); }
-                .mod-num {
-                    position: absolute; top: 12px; right: 16px;
-                    font-family: 'Russo One', sans-serif; font-size: 11px;
-                    color: rgba(0,229,255,0.15); transition: color .25s; z-index: 1;
+                .mod-desc {
+                    font-size: 15px;
+                    color: #B9B8D8;
+                    line-height: 1.45;
+                    min-height: 44px;
+                    margin-bottom: 16px;
+                    font-weight: 400;
+                    position: relative;
+                    z-index: 1;
+                    flex: 1;
                 }
-                .mod-card:hover .mod-num { color: rgba(0,229,255,0.3); }
-                .mod-cta {
-                    margin-top: 18px; font-size: 10px; letter-spacing: .18em;
-                    text-transform: uppercase; color: var(--c);
-                    display: flex; align-items: center; gap: 6px;
-                    opacity: 0; transition: opacity .25s; position: relative; z-index: 1;
+                .mod-footer {
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: space-between;
+                    gap: 12px;
+                    border-top: 1px solid rgba(0,229,255,0.14);
+                    padding-top: 12px;
                 }
-                .mod-card:hover .mod-cta { opacity: 1; }
+                .mod-old-fee {
+                    color: #8B8BAF;
+                    text-decoration: line-through;
+                    font-size: 14px;
+                    line-height: 1.2;
+                    min-height: 18px;
+                }
+                .mod-fee {
+                    background: linear-gradient(135deg, #00E5FF 0%, #A855F7 55%, #FF6EB4 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    font-family: 'Russo One', sans-serif;
+                    font-size: 34px;
+                    letter-spacing: .01em;
+                    line-height: 1;
+                }
+                .mod-discount {
+                    color: #00E5FF;
+                    font-size: 16px;
+                    font-weight: 600;
+                    line-height: 1.2;
+                }
+                .mod-register-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    background: linear-gradient(135deg, rgba(0,229,255,0.16), rgba(168,85,247,0.2));
+                    color: #F0EEFF;
+                    border: 1px solid rgba(0,229,255,0.35);
+                    border-radius: 10px;
+                    padding: 10px 16px;
+                    font-weight: 700;
+                    font-size: 22px;
+                    cursor: pointer;
+                    text-decoration: none;
+                    flex-shrink: 0;
+                    transition: transform .2s ease, background .2s ease;
+                }
+                .mod-register-btn:hover {
+                    background: linear-gradient(135deg, rgba(0,229,255,0.24), rgba(168,85,247,0.3));
+                    border-color: rgba(0,229,255,0.65);
+                    transform: translateY(-1px);
+                }
 
                 /* Gallery */
                 .gal-item { position: relative; overflow: hidden; cursor: pointer; }
@@ -394,10 +471,16 @@ export default function Welcome() {
                 <div style={{ position: 'absolute', bottom: 0, left: 0, width: 0, height: 0, borderStyle: 'solid', borderWidth: '90px 90px 0 0', borderColor: 'rgba(168,85,247,0.05) transparent transparent transparent', pointerEvents: 'none' }} />
 
                 <div style={{ textAlign: 'center', position: 'relative', zIndex: 2, padding: '0 clamp(20px,5vw,60px)' }}>
-                    <p className="sec-label a1">IBA Karachi Presents</p>
-
                     <h1 className="a2" style={{ fontFamily: 'Russo One, sans-serif', fontSize: 'clamp(4rem,16vw,12rem)', lineHeight: .9, textTransform: 'uppercase', color: '#F0EEFF', letterSpacing: '-.01em' }}>
-                        KARACHI<br />
+                        <span style={{
+                            background: 'linear-gradient(180deg, #F8FAFF 0%, #D9DDEA 35%, #B2BACF 65%, #EEF2FF 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text',
+                        }}>
+                            KARACHI
+                        </span>
+                        <br />
                         <span className="holo-text" style={{ textShadow: 'none' }}>GALA</span>
                     </h1>
 
@@ -466,10 +549,10 @@ export default function Welcome() {
                     {/* Stats row */}
                     <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '2px' }}>
                         {[
-                            { val: '20+', lbl: 'Competitions' },
+                            { val: '10+', lbl: 'Competitions' },
                             { val: '1000+', lbl: 'Participants' },
-                            { val: '4', lbl: 'Categories' },
-                            { val: '1', lbl: 'Epic Day' },
+                            { val: '2', lbl: 'Categories' },
+                            { val: '4', lbl: 'Epic Days' },
                         ].map(({ val, lbl }) => (
                             <div key={lbl} style={{
                                 padding: 'clamp(20px,3vw,32px) clamp(24px,4vw,48px)',
@@ -486,6 +569,7 @@ export default function Welcome() {
             </section>
 
             {/* ── EARLY BIRD COUNTDOWN ───────────────────────────────── */}
+            {earlyBirdEnabled && (
             <section style={{ position: 'relative', padding: 'clamp(64px,11vh,112px) clamp(20px,7vw,110px)', background: '#08071A', overflow: 'hidden' }}>
                 {/* Background orbs */}
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
@@ -556,6 +640,7 @@ export default function Welcome() {
                     )}
                 </div>
             </section>
+            )}
 
             {/* ── GALLERY ────────────────────────────────────────────── */}
             <section id="gallery" style={{ padding: 'clamp(72px,13vh,128px) clamp(20px,7vw,110px)', background: '#08071A' }}>
@@ -601,22 +686,37 @@ export default function Welcome() {
                         Eight competitions. Eight chances to prove yourself. Max two per delegate.
                     </p>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,240px),1fr))', gap: '2px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,340px),1fr))', gap: '20px' }}>
                         {modules.map((mod, i) => {
                             const Icon = moduleIcon(mod.name);
+                            const earlyBirdPrice = mod.early_bird_price ?? 'TBD';
+                            const normalPrice = mod.normal_price ?? 'TBD';
+                            const activePrice = earlyBirdEnabled ? earlyBirdPrice : normalPrice;
                             return (
                                 <div key={mod.id} className="mod-card"
                                     onMouseEnter={() => setHoveredMod(i)}
                                     onMouseLeave={() => setHoveredMod(null)}
                                 >
-                                    <span className="mod-num">{String(i + 1).padStart(2, '0')}</span>
-                                    <div className="mod-icon"><Icon size={28} /></div>
+                                    {mod.image_url ? (
+                                        <img src={mod.image_url} alt={mod.name} className="mod-cover" />
+                                    ) : (
+                                        <div className="mod-cover-fallback">
+                                            <div className="mod-icon"><Icon size={38} /></div>
+                                        </div>
+                                    )}
                                     <div className="mod-name">{mod.name}</div>
                                     <div className="mod-desc">{mod.intro}</div>
-                                    <div style={{ marginTop: '12px', display: 'flex', gap: '12px', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
-                                        <span style={{ fontSize: '10px', letterSpacing: '.1em', color: 'rgba(0,229,255,0.6)' }}>🏆 {mod.first_prize}</span>
+                                    <div className="mod-footer">
+                                        <div>
+                                            <div className="mod-old-fee">{earlyBirdEnabled ? normalPrice : ''}</div>
+                                            <div className="mod-fee">{activePrice}</div>
+                                            {earlyBirdEnabled && <div className="mod-discount">Early Bird Discount!</div>}
+                                        </div>
+                                        <Link href="/register" className="mod-register-btn">
+                                            <ShoppingCart size={20} />
+                                            Register
+                                        </Link>
                                     </div>
-                                    <div className="mod-cta">Register <ArrowRight size={11} /></div>
                                 </div>
                             );
                         })}
