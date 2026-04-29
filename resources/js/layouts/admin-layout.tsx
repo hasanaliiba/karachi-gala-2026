@@ -4,6 +4,7 @@ import type { PropsWithChildren } from 'react';
 const navLinks = [
     { href: '/admin/settings', label: 'Settings' },
     { href: '/admin/gallery',  label: 'Gallery' },
+    { href: '/admin/modules',  label: 'Modules' },
 ];
 
 export default function AdminLayout({ children }: PropsWithChildren) {

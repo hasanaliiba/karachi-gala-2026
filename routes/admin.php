@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\GalleryController;
+use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,5 +24,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('gallery/reorder', [GalleryController::class, 'reorder'])->name('gallery.reorder');
         Route::post('gallery/{item}', [GalleryController::class, 'update'])->name('gallery.update');
         Route::delete('gallery/{item}', [GalleryController::class, 'destroy'])->name('gallery.destroy');
+
+        // Modules (games) — reorder must be before {module}
+        Route::get('modules', [ModuleController::class, 'index'])->name('modules.index');
+        Route::post('modules', [ModuleController::class, 'store'])->name('modules.store');
+        Route::post('modules/reorder', [ModuleController::class, 'reorder'])->name('modules.reorder');
+        Route::post('modules/{module}', [ModuleController::class, 'update'])->name('modules.update');
+        Route::delete('modules/{module}', [ModuleController::class, 'destroy'])->name('modules.destroy');
     });
 });
