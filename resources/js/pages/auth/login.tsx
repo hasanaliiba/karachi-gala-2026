@@ -1,12 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+import { useState } from 'react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
@@ -17,105 +12,92 @@ type Props = {
     canRegister: boolean;
 };
 
-export default function Login({
-    status,
-    canResetPassword,
-    canRegister,
-}: Props) {
+export default function Login({ status, canResetPassword, canRegister }: Props) {
+    const [showPassword, setShowPassword] = useState(false);
+
     return (
         <>
             <Head title="Log in" />
 
+            {status && (
+                <div style={{ marginBottom: '20px', textAlign: 'center', fontSize: '12px', color: 'var(--c)', letterSpacing: '.04em', fontFamily: "'Chakra Petch', sans-serif" }}>
+                    {status}
+                </div>
+            )}
+
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+                        <div>
+                            <label className="kgl-label" htmlFor="email">Email Address</label>
+                            <input
+                                id="email"
+                                className="kgl-input"
+                                type="email"
+                                name="email"
+                                required
+                                autoFocus
+                                autoComplete="email"
+                                placeholder="you@example.com"
+                            />
+                            {errors.email && <div className="kgl-error">{errors.email}</div>}
+                        </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            Forgot password?
-                                        </TextLink>
-                                    )}
-                                </div>
-                                <PasswordInput
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                <label className="kgl-label" htmlFor="password" style={{ margin: 0 }}>Password</label>
+                                {canResetPassword && (
+                                    <Link href={request()} className="kgl-link" style={{ fontSize: '11px', letterSpacing: '.05em' }}>
+                                        Forgot password?
+                                    </Link>
+                                )}
+                            </div>
+                            <div className="kgl-pw-wrap">
+                                <input
                                     id="password"
+                                    className="kgl-input"
+                                    style={{ paddingRight: '32px' }}
+                                    type={showPassword ? 'text' : 'password'}
                                     name="password"
                                     required
-                                    tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Password"
                                 />
-                                <InputError message={errors.password} />
+                                <button type="button" className="kgl-pw-toggle" onClick={() => setShowPassword(v => !v)} tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                </button>
                             </div>
-
-                            <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="mt-4 w-full"
-                                tabIndex={4}
-                                disabled={processing}
-                                data-test="login-button"
-                            >
-                                {processing && <Spinner />}
-                                Log in
-                            </Button>
+                            {errors.password && <div className="kgl-error">{errors.password}</div>}
                         </div>
 
+                        <label className="kgl-checkbox-wrap" style={{ marginTop: '-8px' }}>
+                            <input type="checkbox" name="remember" className="kgl-checkbox" />
+                            <span className="kgl-checkbox-label">Remember me</span>
+                        </label>
+
+                        <button type="submit" className="kgl-btn" disabled={processing}>
+                            {processing && <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />}
+                            Log In
+                        </button>
+
                         {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
-                                </TextLink>
+                            <div style={{ textAlign: 'center', fontSize: '13px', color: 'var(--dim)', fontFamily: "'Chakra Petch', sans-serif" }}>
+                                No account?{' '}
+                                <Link href={register()} className="kgl-link">Sign up</Link>
                             </div>
                         )}
                     </>
                 )}
             </Form>
-
-            {status && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
         </>
     );
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: 'Welcome Back',
+    description: 'Sign in to your KGL account',
 };

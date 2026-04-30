@@ -1,15 +1,13 @@
-import { Form, Head } from '@inertiajs/react';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
+import { Form, Head, Link } from '@inertiajs/react';
+import { useState } from 'react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 
 export default function Register() {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
     return (
         <>
             <Head title="Register" />
@@ -17,89 +15,87 @@ export default function Register() {
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
-                className="flex flex-col gap-6"
+                style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="name"
-                                    name="name"
-                                    placeholder="Full name"
-                                />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="email"
-                                    name="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <PasswordInput
-                                    id="password"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="new-password"
-                                    name="password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="new-password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm password"
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="mt-2 w-full"
-                                tabIndex={5}
-                                data-test="register-user-button"
-                            >
-                                {processing && <Spinner />}
-                                Create account
-                            </Button>
+                        <div>
+                            <label className="kgl-label" htmlFor="name">Full Name</label>
+                            <input
+                                id="name"
+                                className="kgl-input"
+                                type="text"
+                                name="name"
+                                required
+                                autoFocus
+                                autoComplete="name"
+                                placeholder="Your full name"
+                            />
+                            {errors.name && <div className="kgl-error">{errors.name}</div>}
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
-                                Log in
-                            </TextLink>
+                        <div>
+                            <label className="kgl-label" htmlFor="email">Email Address</label>
+                            <input
+                                id="email"
+                                className="kgl-input"
+                                type="email"
+                                name="email"
+                                required
+                                autoComplete="email"
+                                placeholder="you@example.com"
+                            />
+                            {errors.email && <div className="kgl-error">{errors.email}</div>}
+                        </div>
+
+                        <div>
+                            <label className="kgl-label" htmlFor="password">Password</label>
+                            <div className="kgl-pw-wrap">
+                                <input
+                                    id="password"
+                                    className="kgl-input"
+                                    style={{ paddingRight: '32px' }}
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    required
+                                    autoComplete="new-password"
+                                    placeholder="Password"
+                                />
+                                <button type="button" className="kgl-pw-toggle" onClick={() => setShowPassword(v => !v)} tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                </button>
+                            </div>
+                            {errors.password && <div className="kgl-error">{errors.password}</div>}
+                        </div>
+
+                        <div>
+                            <label className="kgl-label" htmlFor="password_confirmation">Confirm Password</label>
+                            <div className="kgl-pw-wrap">
+                                <input
+                                    id="password_confirmation"
+                                    className="kgl-input"
+                                    style={{ paddingRight: '32px' }}
+                                    type={showConfirm ? 'text' : 'password'}
+                                    name="password_confirmation"
+                                    required
+                                    autoComplete="new-password"
+                                    placeholder="Confirm password"
+                                />
+                                <button type="button" className="kgl-pw-toggle" onClick={() => setShowConfirm(v => !v)} tabIndex={-1} aria-label={showConfirm ? 'Hide password' : 'Show password'}>
+                                    {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
+                                </button>
+                            </div>
+                            {errors.password_confirmation && <div className="kgl-error">{errors.password_confirmation}</div>}
+                        </div>
+
+                        <button type="submit" className="kgl-btn" disabled={processing}>
+                            {processing && <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />}
+                            Create Account
+                        </button>
+
+                        <div style={{ textAlign: 'center', fontSize: '13px', color: 'var(--dim)', fontFamily: "'Chakra Petch', sans-serif" }}>
+                            Already registered?{' '}
+                            <Link href={login()} className="kgl-link">Log in</Link>
                         </div>
                     </>
                 )}
@@ -109,6 +105,6 @@ export default function Register() {
 }
 
 Register.layout = {
-    title: 'Create an account',
-    description: 'Enter your details below to create your account',
+    title: 'Join KGL 2026',
+    description: 'Create your account to register for events',
 };
