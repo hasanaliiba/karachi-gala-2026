@@ -22,7 +22,9 @@ class HomeController extends Controller
                 ->map(fn (GalleryItem $item) => [
                     'id'         => $item->id,
                     'label'      => $item->label,
-                    'image_url'  => '/storage/' . $item->image_path,
+                    'image_url'  => $item->image_path
+                        ? (str_starts_with($item->image_path, 'assets/') ? '/' . $item->image_path : '/storage/' . $item->image_path)
+                        : '',
                     'wide'       => $item->wide,
                     'sort_order' => $item->sort_order,
                 ]),
@@ -31,7 +33,9 @@ class HomeController extends Controller
                 ->map(fn (Module $m) => [
                     'id'           => $m->id,
                     'name'         => $m->name,
-                    'image_url'    => $m->image_path ? '/storage/' . $m->image_path : null,
+                    'image_url'    => $m->image_path
+                        ? (str_starts_with($m->image_path, 'assets/') ? '/' . $m->image_path : '/storage/' . $m->image_path)
+                        : null,
                     'intro'        => $m->intro,
                     'how_to_play'  => $m->how_to_play,
                     'rules'        => $m->rules,
@@ -40,8 +44,10 @@ class HomeController extends Controller
                     'normal_price' => $m->normal_price,
                     'first_prize'  => $m->first_prize,
                     'second_prize' => $m->second_prize,
-                    'min_cap'      => $m->min_cap,
-                    'max_cap'      => $m->max_cap,
+                    'min_delegations' => $m->min_delegations,
+                    'max_delegations' => $m->max_delegations,
+                    'min_participants' => $m->min_participants,
+                    'max_participants' => $m->max_participants,
                 ]),
         ]);
     }

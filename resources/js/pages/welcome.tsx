@@ -1,8 +1,8 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import {
-    Menu, X, Instagram, Twitter, Facebook, Mail, Phone, MapPin,
-    Send, ChevronDown, Crown, Gamepad2, Target, Zap, Wind,
+    Menu, X, Instagram, Mail, Phone, MapPin,
+    ChevronDown, Crown, Gamepad2, Target, Zap, Wind,
     Activity, Users, Dumbbell, ArrowRight, ShoppingCart,
 } from 'lucide-react';
 
@@ -30,7 +30,7 @@ export default function Welcome() {
         how_to_play: string[]; rules: string; registration: string[];
         early_bird_price: string | null;
         normal_price: string | null;
-        first_prize: string; second_prize: string; min_cap: number; max_cap: number;
+        first_prize: string; second_prize: string; min_delegations: number; max_delegations: number; min_participants: number; max_participants: number;
     };
 
     const { earlyBirdDate, earlyBirdEnabled, galleryItems, modules } = usePage<{
@@ -43,8 +43,6 @@ export default function Welcome() {
     const [scrolled, setScrolled]         = useState(false);
     const [hoveredMod, setHoveredMod]     = useState<number | null>(null);
     const [hoveredGal, setHoveredGal]     = useState<number | null>(null);
-    const [focusedField, setFocusedField] = useState<string | null>(null);
-    const [form, setForm] = useState({ name: '', email: '', message: '' });
 
     const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -74,19 +72,6 @@ export default function Welcome() {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
         setMenuOpen(false);
     };
-
-    const inputStyle = (name: string): React.CSSProperties => ({
-        width: '100%',
-        background: 'transparent',
-        border: 'none',
-        borderBottom: `1px solid ${focusedField === name ? '#00E5FF' : 'rgba(0,229,255,0.2)'}`,
-        padding: '12px 0',
-        fontFamily: "'Chakra Petch', sans-serif",
-        fontSize: '14px',
-        color: '#F0EEFF',
-        outline: 'none',
-        transition: 'border-color 0.25s',
-    });
 
     return (
         <>
@@ -318,13 +303,6 @@ export default function Welcome() {
                     border-top: 1px solid rgba(0,229,255,0.14);
                     padding-top: 12px;
                 }
-                .mod-old-fee {
-                    color: #8B8BAF;
-                    text-decoration: line-through;
-                    font-size: 14px;
-                    line-height: 1.2;
-                    min-height: 18px;
-                }
                 .mod-fee {
                     background: linear-gradient(135deg, #00E5FF 0%, #A855F7 55%, #FF6EB4 100%);
                     -webkit-background-clip: text;
@@ -334,12 +312,6 @@ export default function Welcome() {
                     font-size: 34px;
                     letter-spacing: .01em;
                     line-height: 1;
-                }
-                .mod-discount {
-                    color: #00E5FF;
-                    font-size: 16px;
-                    font-weight: 600;
-                    line-height: 1.2;
                 }
                 .mod-register-btn {
                     display: inline-flex;
@@ -435,7 +407,10 @@ export default function Welcome() {
                     ))}
                 </div>
 
-                <Link href="/register" className="btn-holo hidden md:inline-flex">Register Now</Link>
+                <div className="hidden md:flex" style={{ alignItems: 'center', gap: '12px' }}>
+                    <Link href="/login" className="btn-outline">Log in</Link>
+                    <Link href="/register" className="btn-holo">Register Now</Link>
+                </div>
 
                 <button onClick={() => setMenuOpen(o => !o)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#00E5FF', padding: '4px' }} className="flex md:hidden">
                     {menuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -455,7 +430,10 @@ export default function Welcome() {
                             {s}
                         </button>
                     ))}
-                    <Link href="/register" className="btn-holo">Register Now</Link>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                        <Link href="/login" className="btn-outline">Log in</Link>
+                        <Link href="/register" className="btn-holo">Register Now</Link>
+                    </div>
                 </div>
             )}
 
@@ -689,9 +667,7 @@ export default function Welcome() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,340px),1fr))', gap: '20px' }}>
                         {modules.map((mod, i) => {
                             const Icon = moduleIcon(mod.name);
-                            const earlyBirdPrice = mod.early_bird_price ?? 'TBD';
-                            const normalPrice = mod.normal_price ?? 'TBD';
-                            const activePrice = earlyBirdEnabled ? earlyBirdPrice : normalPrice;
+                            const displayPrice = mod.normal_price ?? 'TBD';
                             return (
                                 <div key={mod.id} className="mod-card"
                                     onMouseEnter={() => setHoveredMod(i)}
@@ -708,9 +684,7 @@ export default function Welcome() {
                                     <div className="mod-desc">{mod.intro}</div>
                                     <div className="mod-footer">
                                         <div>
-                                            <div className="mod-old-fee">{earlyBirdEnabled ? normalPrice : ''}</div>
-                                            <div className="mod-fee">{activePrice}</div>
-                                            {earlyBirdEnabled && <div className="mod-discount">Early Bird Discount!</div>}
+                                            <div className="mod-fee">{displayPrice}</div>
                                         </div>
                                         <Link href="/register" className="mod-register-btn">
                                             <ShoppingCart size={20} />
@@ -733,56 +707,63 @@ export default function Welcome() {
                     </h2>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(100%,300px),1fr))', gap: 'clamp(48px,8vw,96px)' }}>
-                        <form onSubmit={e => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
-                            {([
-                                { name: 'name',  label: 'Full Name', type: 'text',  ph: 'Your full name' },
-                                { name: 'email', label: 'Email',     type: 'email', ph: 'you@example.com' },
-                            ] as const).map(({ name, label, type, ph }) => (
-                                <div key={name}>
-                                    <label style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '.25em', textTransform: 'uppercase', color: '#00E5FF', marginBottom: '10px' }}>{label}</label>
-                                    <input type={type} placeholder={ph} value={form[name as 'name'|'email']}
-                                        onChange={e => setForm(p => ({ ...p, [name]: e.target.value }))}
-                                        onFocus={() => setFocusedField(name)} onBlur={() => setFocusedField(null)}
-                                        style={inputStyle(name)} />
-                                </div>
-                            ))}
-                            <div>
-                                <label style={{ display: 'block', fontSize: '10px', fontWeight: 700, letterSpacing: '.25em', textTransform: 'uppercase', color: '#00E5FF', marginBottom: '10px' }}>Message</label>
-                                <textarea placeholder="Your message..." rows={4} value={form.message}
-                                    onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
-                                    onFocus={() => setFocusedField('message')} onBlur={() => setFocusedField(null)}
-                                    style={{ ...inputStyle('message'), resize: 'none' }} />
-                            </div>
-                            <div>
-                                <button type="submit" className="btn-holo" style={{}}>
-                                    Send Message <Send size={13} />
-                                </button>
-                            </div>
-                        </form>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                            <p style={{ color: '#8B8BAF', fontSize: '14px', lineHeight: 1.75, fontWeight: 300 }}>
+                                Reach the Karachi Gala League team by email or phone. Tap below to open your mail app.
+                            </p>
+                            <a
+                                href="mailto:kgl2k26@gmail.com?subject=Karachi%20Gala%20League%20inquiry"
+                                className="btn-holo"
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', width: 'fit-content', textDecoration: 'none' }}
+                            >
+                                <Mail size={18} />
+                                Email kgl2k26@gmail.com
+                            </a>
+                        </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
                             <div>
                                 <h3 style={{ fontFamily: 'Russo One, sans-serif', fontSize: '18px', textTransform: 'uppercase', color: '#F0EEFF', marginBottom: '24px', letterSpacing: '.05em' }}>Contact Info</h3>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                                    {[
-                                        { Icon: Mail,   text: 'karachigala@iba.edu.pk' },
-                                        { Icon: Phone,  text: '+92 21 3810 4700' },
-                                        { Icon: MapPin, text: 'IBA Main Campus, University Road, Karachi' },
-                                    ].map(({ Icon, text }) => (
-                                        <div key={text} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', color: '#8B8BAF', fontSize: '13px', lineHeight: 1.7, fontWeight: 300 }}>
-                                            <Icon size={15} color="#00E5FF" style={{ marginTop: '3px', flexShrink: 0 }} />
-                                            {text}
-                                        </div>
-                                    ))}
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', color: '#8B8BAF', fontSize: '13px', lineHeight: 1.7, fontWeight: 300 }}>
+                                        <Mail size={15} color="#00E5FF" style={{ marginTop: '3px', flexShrink: 0 }} />
+                                        <a href="mailto:kgl2k26@gmail.com" style={{ color: '#B9B8D8', textDecoration: 'none', borderBottom: '1px solid rgba(0,229,255,0.25)' }}>
+                                            kgl2k26@gmail.com
+                                        </a>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', color: '#8B8BAF', fontSize: '13px', lineHeight: 1.7, fontWeight: 300 }}>
+                                        <Phone size={15} color="#00E5FF" style={{ marginTop: '3px', flexShrink: 0 }} />
+                                        <span style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                            <a href="tel:+923322449363" style={{ color: '#B9B8D8', textDecoration: 'none' }}>0332 244 9363</a>
+                                            <a href="tel:+923352314757" style={{ color: '#B9B8D8', textDecoration: 'none' }}>0335 231 4757</a>
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', color: '#8B8BAF', fontSize: '13px', lineHeight: 1.7, fontWeight: 300 }}>
+                                        <MapPin size={15} color="#00E5FF" style={{ marginTop: '3px', flexShrink: 0 }} />
+                                        IBA Main Campus, University Road, Karachi
+                                    </div>
                                 </div>
                             </div>
 
                             <div>
                                 <h3 style={{ fontFamily: 'Russo One, sans-serif', fontSize: '18px', textTransform: 'uppercase', color: '#F0EEFF', marginBottom: '18px', letterSpacing: '.05em' }}>Follow Us</h3>
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                                        <button key={i} aria-label="social" className="social-btn"><Icon size={17} /></button>
-                                    ))}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                    <a
+                                        href="https://www.instagram.com/kgl2k26/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="social-btn"
+                                        aria-label="Instagram @kgl2k26"
+                                        style={{ textDecoration: 'none', display: 'inline-flex' }}
+                                    >
+                                        <Instagram size={17} />
+                                    </a>
+                                    <span style={{ color: '#8B8BAF', fontSize: '14px' }}>
+                                        Instagram:{' '}
+                                        <a href="https://www.instagram.com/kgl2k26/" target="_blank" rel="noopener noreferrer" style={{ color: '#00E5FF', textDecoration: 'none' }}>
+                                            @kgl2k26
+                                        </a>
+                                    </span>
                                 </div>
                             </div>
 
@@ -803,11 +784,9 @@ export default function Welcome() {
                         KGL <span style={{ fontFamily: 'Chakra Petch, sans-serif', fontSize: '14px', fontWeight: 400, background: 'none', WebkitTextFillColor: '#8B8BAF' }}>2026</span>
                     </span>
                     <p style={{ fontSize: '11px', color: '#8B8BAF', letterSpacing: '.06em' }}>© 2026 Karachi Gala League · IBA Karachi</p>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                            <button key={i} aria-label="social" className="footer-link"><Icon size={15} /></button>
-                        ))}
-                    </div>
+                    <a href="https://www.instagram.com/kgl2k26/" target="_blank" rel="noopener noreferrer" aria-label="Instagram @kgl2k26" className="footer-link" style={{ display: 'inline-flex' }}>
+                        <Instagram size={15} />
+                    </a>
                 </div>
             </footer>
         </>

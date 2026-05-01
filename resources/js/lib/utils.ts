@@ -10,3 +10,14 @@ export function cn(...inputs: ClassValue[]) {
 export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+/** Files under `public/assets/` vs uploads in `storage/app/public/` (same rule as HomeController). */
+export function publicMediaUrl(path: string | null | undefined): string | null {
+    if (!path) {
+        return null;
+    }
+    if (path.startsWith('assets/')) {
+        return '/' + path;
+    }
+    return '/storage/' + path;
+}

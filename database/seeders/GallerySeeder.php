@@ -4,48 +4,35 @@ namespace Database\Seeders;
 
 use App\Models\GalleryItem;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class GallerySeeder extends Seeder
 {
     public function run(): void
     {
-        $dir = storage_path('app/public/gallery');
-        if (! is_dir($dir)) {
-            mkdir($dir, 0755, true);
+        foreach (GalleryItem::cursor() as $item) {
+            if ($item->image_path && ! str_starts_with($item->image_path, 'assets/')) {
+                Storage::disk('public')->delete($item->image_path);
+            }
         }
 
-        $placeholder = $dir . '/placeholder.png';
-        if (! file_exists($placeholder)) {
-            // 1×1 dark pixel PNG
-            file_put_contents($placeholder, base64_decode(
-                'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVQI12NgAAIA' .
-                'BQAAbjjWAwAAAABJRU5ErkJggg=='
-            ));
-        }
+        GalleryItem::query()->delete();
 
         $items = [
-            ['label' => 'Opening Ceremony', 'wide' => true],
-            ['label' => 'Chess Finals',     'wide' => false],
-            ['label' => 'FIFA Showdown',    'wide' => false],
-            ['label' => 'Cricket Match',    'wide' => false],
-            ['label' => 'Badminton Court',  'wide' => false],
-            ['label' => 'Tug of War',       'wide' => false],
-            ['label' => 'Award Ceremony',   'wide' => true],
-            ['label' => 'Table Tennis',     'wide' => false],
-            ['label' => 'Carrom Battle',    'wide' => false],
-            ['label' => 'Closing Night',    'wide' => false],
-            ['label' => 'Team Photos',      'wide' => false],
+            ['label' => 'Karachi Gala — Moments 1', 'image_path' => 'assets/past_events/1.jpeg', 'wide' => true],
+            ['label' => 'Karachi Gala — Moments 2', 'image_path' => 'assets/past_events/2.jpeg', 'wide' => false],
+            ['label' => 'Karachi Gala — Moments 3', 'image_path' => 'assets/past_events/3.jpeg', 'wide' => false],
+            ['label' => 'Karachi Gala — Moments 4', 'image_path' => 'assets/past_events/4.jpeg', 'wide' => false],
+            ['label' => 'Karachi Gala — Moments 5', 'image_path' => 'assets/past_events/5.jpeg', 'wide' => true],
         ];
 
-        foreach ($items as $order => $item) {
-            GalleryItem::firstOrCreate(
-                ['label' => $item['label']],
-                [
-                    'image_path' => 'gallery/placeholder.png',
-                    'wide'       => $item['wide'],
-                    'sort_order' => $order,
-                ]
-            );
+        foreach ($items as $order => $row) {
+            GalleryItem::create([
+                'label'      => $row['label'],
+                'image_path' => $row['image_path'],
+                'wide'       => $row['wide'],
+                'sort_order' => $order,
+            ]);
         }
     }
 }

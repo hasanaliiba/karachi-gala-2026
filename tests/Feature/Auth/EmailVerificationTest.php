@@ -38,7 +38,7 @@ class EmailVerificationTest extends TestCase
 
         Event::assertDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
-        $response->assertRedirect('/dashboard?verified=1');
+        $response->assertRedirect('/delegations/create?verified=1');
     }
 
     public function test_email_is_not_verified_with_invalid_hash()
@@ -86,7 +86,7 @@ class EmailVerificationTest extends TestCase
         $response = $this->actingAs($user)->get(route('verification.notice'));
 
         Event::assertNotDispatched(Verified::class);
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect('/delegations/create');
     }
 
     public function test_already_verified_user_visiting_verification_link_is_redirected_without_firing_event_again(): void
@@ -102,7 +102,7 @@ class EmailVerificationTest extends TestCase
         );
 
         $this->actingAs($user)->get($verificationUrl)
-            ->assertRedirect('/dashboard?verified=1');
+            ->assertRedirect('/delegations/create?verified=1');
 
         Event::assertNotDispatched(Verified::class);
         $this->assertTrue($user->fresh()->hasVerifiedEmail());

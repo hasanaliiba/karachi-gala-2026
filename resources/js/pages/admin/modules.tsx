@@ -1,5 +1,6 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { publicMediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,8 +18,10 @@ type Module = {
     normal_price: string;
     first_prize: string;
     second_prize: string;
-    min_cap: number;
-    max_cap: number;
+    min_delegations: number;
+    max_delegations: number;
+    min_participants: number;
+    max_participants: number;
     sort_order: number;
 };
 
@@ -33,8 +36,10 @@ type FormData = {
     normal_price: string;
     first_prize: string;
     second_prize: string;
-    min_cap: number | '';
-    max_cap: number | '';
+    min_delegations: number | '';
+    max_delegations: number | '';
+    min_participants: number | '';
+    max_participants: number | '';
 };
 
 const empty: FormData = {
@@ -48,8 +53,10 @@ const empty: FormData = {
     normal_price: '',
     first_prize: '',
     second_prize: '',
-    min_cap: '',
-    max_cap: '',
+    min_delegations: '',
+    max_delegations: '',
+    min_participants: '',
+    max_participants: '',
 };
 
 function BulletListEditor({
@@ -249,30 +256,59 @@ function ModuleForm({
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-1.5">
-                    <Label htmlFor={`${action}-min`}>Min Participants</Label>
+                    <Label htmlFor={`${action}-min`}>Min Delegations</Label>
                     <Input
                         id={`${action}-min`}
                         type="number"
                         min={1}
-                        value={data.min_cap}
-                        onChange={e => setData('min_cap', e.target.value === '' ? '' : Number(e.target.value))}
+                        value={data.min_delegations}
+                        onChange={e => setData('min_delegations', e.target.value === '' ? '' : Number(e.target.value))}
                         placeholder="e.g. 8"
                         required
                     />
-                    {errors.min_cap && <p className="text-sm text-red-500">{errors.min_cap}</p>}
+                    {errors.min_delegations && <p className="text-sm text-red-500">{errors.min_delegations}</p>}
                 </div>
                 <div className="grid gap-1.5">
-                    <Label htmlFor={`${action}-max`}>Max Participants</Label>
+                    <Label htmlFor={`${action}-max`}>Max Delegations</Label>
                     <Input
                         id={`${action}-max`}
                         type="number"
                         min={1}
-                        value={data.max_cap}
-                        onChange={e => setData('max_cap', e.target.value === '' ? '' : Number(e.target.value))}
+                        value={data.max_delegations}
+                        onChange={e => setData('max_delegations', e.target.value === '' ? '' : Number(e.target.value))}
                         placeholder="e.g. 32"
                         required
                     />
-                    {errors.max_cap && <p className="text-sm text-red-500">{errors.max_cap}</p>}
+                    {errors.max_delegations && <p className="text-sm text-red-500">{errors.max_delegations}</p>}
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-1.5">
+                    <Label htmlFor={`${action}-min-p`}>Min Participants Required</Label>
+                    <Input
+                        id={`${action}-min-p`}
+                        type="number"
+                        min={1}
+                        value={data.min_participants}
+                        onChange={e => setData('min_participants', e.target.value === '' ? '' : Number(e.target.value))}
+                        placeholder="e.g. 1"
+                        required
+                    />
+                    {errors.min_participants && <p className="text-sm text-red-500">{errors.min_participants}</p>}
+                </div>
+                <div className="grid gap-1.5">
+                    <Label htmlFor={`${action}-max-p`}>Max Participants Allowed</Label>
+                    <Input
+                        id={`${action}-max-p`}
+                        type="number"
+                        min={1}
+                        value={data.max_participants}
+                        onChange={e => setData('max_participants', e.target.value === '' ? '' : Number(e.target.value))}
+                        placeholder="e.g. 8"
+                        required
+                    />
+                    {errors.max_participants && <p className="text-sm text-red-500">{errors.max_participants}</p>}
                 </div>
             </div>
 
@@ -307,8 +343,10 @@ function EditPanel({ module, onClose }: { module: Module; onClose: () => void })
                     normal_price: module.normal_price,
                     first_prize: module.first_prize,
                     second_prize: module.second_prize,
-                    min_cap: module.min_cap,
-                    max_cap: module.max_cap,
+                    min_delegations: module.min_delegations,
+                    max_delegations: module.max_delegations,
+                    min_participants: module.min_participants,
+                    max_participants: module.max_participants,
                 }}
                 action={`/admin/modules/${module.id}`}
                 submitLabel="Save Changes"
@@ -380,7 +418,9 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                 {modules.length === 0 && (
                     <p className="p-6 text-sm" style={{ color: '#8B8BAF' }}>No modules yet. Add one above.</p>
                 )}
-                {modules.map((module, index) => (
+                {modules.map((module, index) => {
+                    const coverUrl = publicMediaUrl(module.image_path);
+                    return (
                     <div key={module.id} style={{ borderBottom: index < modules.length - 1 ? '1px solid rgba(0,229,255,0.08)' : 'none' }}>
                         <div className="flex items-start gap-4 p-4">
                             <div className="flex flex-col gap-1">
@@ -388,9 +428,9 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                                 <Button size="sm" variant="ghost" onClick={() => move(index, 'down')} disabled={index === modules.length - 1} title="Move down">↓</Button>
                             </div>
                             <div className="flex-1">
-                                {module.image_path && (
+                                {coverUrl && (
                                     <img
-                                        src={`/storage/${module.image_path}`}
+                                        src={coverUrl}
                                         alt={module.name}
                                         className="mb-2 h-20 w-32 rounded object-cover"
                                         style={{ background: 'rgba(0,229,255,0.05)' }}
@@ -402,7 +442,8 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                                     <span>💸 {module.early_bird_price} (Early) / {module.normal_price} (Normal)</span>
                                     <span>🏆 {module.first_prize}</span>
                                     <span>🥈 {module.second_prize}</span>
-                                    <span>👥 {module.min_cap}–{module.max_cap} participants</span>
+                                    <span>🧾 {module.min_delegations}–{module.max_delegations} delegations</span>
+                                    <span>👥 {module.min_participants}–{module.max_participants} participants</span>
                                 </div>
                             </div>
                             <div className="flex gap-1 shrink-0">
@@ -427,7 +468,8 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                             <EditPanel module={module} onClose={() => setEditingId(null)} />
                         )}
                     </div>
-                ))}
+                    );
+                })}
             </div>
         </>
     );

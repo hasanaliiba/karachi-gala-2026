@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\DelegationController as AdminDelegationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -31,5 +32,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('modules/reorder', [ModuleController::class, 'reorder'])->name('modules.reorder');
         Route::post('modules/{module}', [ModuleController::class, 'update'])->name('modules.update');
         Route::delete('modules/{module}', [ModuleController::class, 'destroy'])->name('modules.destroy');
+
+        Route::get('delegations', [AdminDelegationController::class, 'index'])->name('delegations.index');
+        Route::get('delegations/{delegation}', [AdminDelegationController::class, 'show'])->name('delegations.show');
+        Route::post('delegations/{delegation}/verify', [AdminDelegationController::class, 'verify'])->name('delegations.verify');
     });
 });

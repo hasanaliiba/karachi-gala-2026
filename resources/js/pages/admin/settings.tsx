@@ -8,14 +8,16 @@ import { Spinner } from '@/components/ui/spinner';
 type Props = {
     earlyBirdDate: string;
     earlyBirdEnabled: boolean;
+    registrationDiscountPercent: number;
 };
 
-export default function AdminSettings({ earlyBirdDate, earlyBirdEnabled }: Props) {
+export default function AdminSettings({ earlyBirdDate, earlyBirdEnabled, registrationDiscountPercent }: Props) {
     const { props } = usePage<{ flash?: { success?: string } }>();
 
     const { data, setData, patch, processing, errors } = useForm({
         early_bird_date: earlyBirdDate,
         early_bird_enabled: earlyBirdEnabled,
+        registration_discount_percent: registrationDiscountPercent,
     });
 
     function submit(e: React.FormEvent) {
@@ -73,10 +75,29 @@ export default function AdminSettings({ earlyBirdDate, earlyBirdEnabled }: Props
                             <Label htmlFor="early_bird_enabled">Enable early bird discount on welcome page</Label>
                         </div>
                         <p className="text-xs" style={{ color: '#8B8BAF' }}>
-                            When disabled, only normal module prices are shown on the welcome page.
+                            When disabled, only normal module prices are shown on the welcome page and registration checkout.
                         </p>
                         {errors.early_bird_enabled && (
                             <p className="text-sm text-red-500">{errors.early_bird_enabled}</p>
+                        )}
+                    </div>
+
+                    <div className="grid gap-1.5">
+                        <Label htmlFor="registration_discount_percent">Registration discount on base &amp; socials (%)</Label>
+                        <p className="text-xs" style={{ color: '#8B8BAF' }}>
+                            When early bird is enabled, this percentage is taken off the general base fee (individual PKR 1000 / group PKR 3000) and social add-ons (e.g. beach party per member). Game/module fees and spectator tickets are not discounted. Use 0 for no extra cut on those lines.
+                        </p>
+                        <Input
+                            id="registration_discount_percent"
+                            type="number"
+                            min={0}
+                            max={100}
+                            value={data.registration_discount_percent}
+                            onChange={(e) => setData('registration_discount_percent', Number(e.target.value))}
+                            required
+                        />
+                        {errors.registration_discount_percent && (
+                            <p className="text-sm text-red-500">{errors.registration_discount_percent}</p>
                         )}
                     </div>
 

@@ -5,6 +5,7 @@ const navLinks = [
     { href: '/admin/settings', label: 'Settings' },
     { href: '/admin/gallery',  label: 'Gallery' },
     { href: '/admin/modules',  label: 'Modules' },
+    { href: '/admin/delegations',  label: 'Delegations' },
 ];
 
 export default function AdminLayout({ children }: PropsWithChildren) {

@@ -50,7 +50,9 @@ class GalleryController extends Controller
         $imagePath = $item->image_path;
 
         if ($request->hasFile('image')) {
-            Storage::disk('public')->delete($item->image_path);
+            if ($item->image_path && ! str_starts_with($item->image_path, 'assets/')) {
+                Storage::disk('public')->delete($item->image_path);
+            }
             $imagePath = $request->file('image')->store('gallery', 'public');
         }
 
@@ -65,7 +67,9 @@ class GalleryController extends Controller
 
     public function destroy(GalleryItem $item): RedirectResponse
     {
-        Storage::disk('public')->delete($item->image_path);
+        if ($item->image_path && ! str_starts_with($item->image_path, 'assets/')) {
+            Storage::disk('public')->delete($item->image_path);
+        }
         $item->delete();
 
         return back()->with('success', 'Image deleted.');

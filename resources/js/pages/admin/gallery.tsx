@@ -1,5 +1,6 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { publicMediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -173,7 +174,7 @@ export default function AdminGallery({ items }: { items: GalleryItem[] }) {
                 {items.map((item, index) => (
                     <div key={item.id} className="flex items-start gap-4 p-4" style={{ borderBottom: index < items.length - 1 ? '1px solid rgba(0,229,255,0.08)' : 'none' }}>
                         <img
-                            src={`/storage/${item.image_path}`}
+                            src={publicMediaUrl(item.image_path) ?? ''}
                             alt={item.label}
                             className="h-16 w-24 shrink-0 rounded object-cover"
                             style={{ background: 'rgba(0,229,255,0.05)' }}

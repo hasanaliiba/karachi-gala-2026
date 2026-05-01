@@ -34,8 +34,10 @@ class ModuleController extends Controller
             'normal_price' => ['required', 'string', 'max:255'],
             'first_prize'  => ['required', 'string', 'max:255'],
             'second_prize' => ['required', 'string', 'max:255'],
-            'min_cap'      => ['required', 'integer', 'min:1'],
-            'max_cap'      => ['required', 'integer', 'gte:min_cap'],
+            'min_delegations' => ['required', 'integer', 'min:1'],
+            'max_delegations' => ['required', 'integer', 'gte:min_delegations'],
+            'min_participants' => ['required', 'integer', 'min:1'],
+            'max_participants' => ['required', 'integer', 'gte:min_participants'],
         ]);
 
         $data['image_path'] = $request->hasFile('image')
@@ -64,8 +66,10 @@ class ModuleController extends Controller
             'normal_price' => ['required', 'string', 'max:255'],
             'first_prize'  => ['required', 'string', 'max:255'],
             'second_prize' => ['required', 'string', 'max:255'],
-            'min_cap'      => ['required', 'integer', 'min:1'],
-            'max_cap'      => ['required', 'integer', 'gte:min_cap'],
+            'min_delegations' => ['required', 'integer', 'min:1'],
+            'max_delegations' => ['required', 'integer', 'gte:min_delegations'],
+            'min_participants' => ['required', 'integer', 'min:1'],
+            'max_participants' => ['required', 'integer', 'gte:min_participants'],
         ]);
 
         if ($request->hasFile('image')) {
