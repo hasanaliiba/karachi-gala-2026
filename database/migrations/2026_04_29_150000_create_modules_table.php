@@ -17,8 +17,10 @@ return new class extends Migration
             $table->json('registration');
             $table->string('first_prize');
             $table->string('second_prize');
-            $table->unsignedInteger('min_cap');
-            $table->unsignedInteger('max_cap');
+            $table->unsignedInteger('min_delegations');
+            $table->unsignedInteger('max_delegations');
+            $table->unsignedInteger('min_participants');
+            $table->unsignedInteger('max_participants');
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
         });
