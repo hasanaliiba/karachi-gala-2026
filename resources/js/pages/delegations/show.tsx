@@ -21,6 +21,7 @@ type Member = {
     email: string;
     contact: string;
     emergency_contact: string | null;
+    social_selections?: string[] | null;
 };
 
 type Delegation = {
@@ -56,7 +57,7 @@ export default function DelegationShow({ delegation }: { delegation: Delegation 
                 <div className="rounded-md border border-cyan-400/20 bg-[#13123A] p-4 text-sm">
                     <p>Type: {delegation.type}</p>
                     <p>Status: {delegation.status}</p>
-                    <p>Socials: {(delegation.socials ?? []).join(', ') || 'None'}</p>
+                    <p>Socials (aggregate): {(delegation.socials ?? []).join(', ') || 'None'}</p>
                     {delegation.qr_token && <p>QR Token: {delegation.qr_token}</p>}
                 </div>
 
@@ -75,7 +76,21 @@ export default function DelegationShow({ delegation }: { delegation: Delegation 
                 <div className="rounded-md border border-cyan-400/20 bg-[#13123A] p-4 text-sm">
                     <p className="mb-2 font-medium">Players ({players.length})</p>
                     {players.map((member) => (
-                        <p key={member.id}>{member.full_name} — {member.cnic} — {member.institute_name}</p>
+                        <div key={member.id} className="mb-2 border-b border-cyan-400/10 pb-2 last:border-0">
+                            <p>
+                                {member.full_name} — {member.cnic} — {member.institute_name}
+                            </p>
+                            {(member.social_selections?.length ?? 0) > 0 && (
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    Socials:{' '}
+                                    {(member.social_selections ?? [])
+                                        .map((s) =>
+                                            s === 'beach_party' ? 'Beach Party' : s === 'qawali_night' ? 'Qawali Night' : s,
+                                        )
+                                        .join(', ')}
+                                </p>
+                            )}
+                        </div>
                     ))}
                 </div>
 

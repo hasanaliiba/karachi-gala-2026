@@ -3,7 +3,14 @@ import { Head, Link } from '@inertiajs/react';
 type PaymentProof = { id: number; file_path: string };
 type Payment = { amount_due: number; status: string; rejection_reason: string | null; proofs: PaymentProof[] };
 type ModuleRow = { id: number; fee_snapshot: number; module: { name: string } };
-type Member = { id: number; member_type: 'player' | 'spectator'; full_name: string; cnic: string; institute_name: string };
+type Member = {
+    id: number;
+    member_type: 'player' | 'spectator';
+    full_name: string;
+    cnic: string;
+    institute_name: string;
+    social_selections?: string[] | null;
+};
 type Delegation = {
     id: number;
     delegation_code: string;
@@ -49,7 +56,21 @@ export default function AdminDelegationShow({ delegation }: { delegation: Delega
                 <div className="rounded-md border border-cyan-400/20 bg-[#13123A] p-4 text-sm">
                     <p className="mb-2 font-medium">Players ({players.length})</p>
                     {players.map((member) => (
-                        <p key={member.id}>{member.full_name} — {member.cnic} — {member.institute_name}</p>
+                        <div key={member.id} className="mb-2 border-b border-cyan-400/10 pb-2 last:border-0">
+                            <p>
+                                {member.full_name} — {member.cnic} — {member.institute_name}
+                            </p>
+                            {(member.social_selections?.length ?? 0) > 0 && (
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    Socials:{' '}
+                                    {(member.social_selections ?? [])
+                                        .map((s) =>
+                                            s === 'beach_party' ? 'Beach Party' : s === 'qawali_night' ? 'Qawali Night' : s,
+                                        )
+                                        .join(', ')}
+                                </p>
+                            )}
+                        </div>
                     ))}
                     <p className="mt-3 mb-2 font-medium">Spectators ({spectators.length})</p>
                     {spectators.length ? spectators.map((member) => (

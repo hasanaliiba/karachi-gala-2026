@@ -27,14 +27,14 @@ type Person = {
     contact: string;
     emergency_contact: string;
     module_ids: number[];
+    /** Per-player social add-ons (qawali free; beach_party adds PKR 3500 for that player). */
+    social_selections: string[];
 };
 
 type Spectator = Omit<Person, 'module_ids'>;
 
 type FormData = {
-    type: 'individual' | 'group';
     module_ids: number[];
-    socials: string[];
     spectators: Spectator[];
     members: Person[];
     undertaking_accepted: boolean;
@@ -69,6 +69,7 @@ const emptyMember: Person = {
     contact: '',
     emergency_contact: '',
     module_ids: [],
+    social_selections: [],
 };
 
 const emptySpectator: Spectator = {
@@ -99,12 +100,33 @@ function applyRegistrationDiscount(gross: number, earlyBirdEnabled: boolean, per
     return Math.round((gross * (100 - percent)) / 100);
 }
 
+function rosterErrors(members: Person[], moduleIds: number[], modulesList: Module[]): string[] {
+    const errs: string[] = [];
+    if (members.length < 1) {
+        return ['Add at least one member.'];
+    }
+    for (const id of moduleIds) {
+        const mod = modulesList.find((x) => x.id === id);
+        if (!mod) {
+            continue;
+        }
+        const required = Math.max(1, mod.team_size ?? 1);
+        const assigned = members.filter((mem) => mem.module_ids.includes(id)).length;
+        if (assigned < required) {
+            errs.push(`${mod.name} requires at least ${required} player(s) assigned (${assigned} assigned).`);
+        }
+    }
+    return errs;
+}
+
 function PersonFields({
+    heading,
     value,
     onChange,
     selectedModuleIds,
     modules,
 }: {
+    heading: string;
     value: Person;
     onChange: (next: Person) => void;
     selectedModuleIds: number[];
@@ -112,6 +134,7 @@ function PersonFields({
 }) {
     return (
         <div className="grid gap-3 rounded-md border border-cyan-400/20 bg-[#13123A] p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-cyan-300">{heading}</p>
             <Input placeholder="Full Name" value={value.full_name} onChange={(e) => onChange({ ...value, full_name: e.target.value })} />
             <Input
                 placeholder="CNIC (42201-0098341-1)"
@@ -197,31 +220,60 @@ function SpectatorFields({
     );
 }
 
+type SocialPricingMap = {
+    qawali_night: number;
+    beach_party: number;
+};
+
+function socialOptionLabels(sp: SocialPricingMap): Record<string, string> {
+    return {
+        qawali_night:
+            sp.qawali_night <= 0
+                ? 'Qawali Night'
+                : `Qawali Night (+ PKR ${sp.qawali_night.toLocaleString()})`,
+        beach_party: `Beach Party (+ PKR ${sp.beach_party.toLocaleString()})`,
+    };
+}
+
 export default function DelegationCreate({
     modules,
     earlyBirdEnabled = false,
     registrationDiscountPercent = 25,
+    socialPricing = { qawali_night: 0, beach_party: 3500 },
 }: {
     modules: Module[];
     earlyBirdEnabled?: boolean;
     registrationDiscountPercent?: number;
+    socialPricing?: SocialPricingMap;
 }) {
     const [step, setStep] = useState(0);
+    const [stepError, setStepError] = useState<string | null>(null);
     const { data, setData, post, processing, errors } = useForm<FormData>({
-        type: 'individual',
         module_ids: [],
-        socials: [],
         spectators: [],
         members: [{ ...emptyMember }],
         undertaking_accepted: false,
     });
 
-    const individualMode = data.type === 'individual';
+    const delegationIsGroup = data.members.length > 1;
+
+    const socialLabels = useMemo(() => socialOptionLabels(socialPricing), [socialPricing]);
 
     const cart = useMemo(() => {
         const selectedModules = modules.filter((m) => data.module_ids.includes(m.id));
-        const baseGross = data.type === 'individual' ? 1000 : 3000;
-        const socialGross = data.socials.includes('beach_party') ? data.members.length * 3500 : 0;
+        const baseGross = delegationIsGroup ? 3000 : 1000;
+        const beachCount = data.members.filter((m) => m.social_selections.includes('beach_party')).length;
+        const qawaliCount = data.members.filter((m) => m.social_selections.includes('qawali_night')).length;
+        const socialGross = data.members.reduce((sum, m) => {
+            let line = 0;
+            if (m.social_selections.includes('qawali_night')) {
+                line += socialPricing.qawali_night;
+            }
+            if (m.social_selections.includes('beach_party')) {
+                line += socialPricing.beach_party;
+            }
+            return sum + line;
+        }, 0);
         const gamesFee = selectedModules.reduce((sum, m) => sum + moduleGameFee(m, earlyBirdEnabled), 0);
         const spectatorFee = data.spectators.length * 500;
         const baseFee = applyRegistrationDiscount(baseGross, earlyBirdEnabled, registrationDiscountPercent);
@@ -238,8 +290,39 @@ export default function DelegationCreate({
             spectatorFee,
             total,
             registrationDiscountActive,
+            beachCount,
+            qawaliCount,
+            delegationLabel: delegationIsGroup ? 'Group' : 'Individual',
         };
-    }, [data, modules, earlyBirdEnabled, registrationDiscountPercent]);
+    }, [data, modules, earlyBirdEnabled, registrationDiscountPercent, delegationIsGroup, socialPricing]);
+
+    function goNext() {
+        setStepError(null);
+        if (step === 0) {
+            if (data.module_ids.length < 1) {
+                setStepError('Select at least one game.');
+                return;
+            }
+        }
+        if (step === 1) {
+            const roster = rosterErrors(data.members, data.module_ids, modules);
+            if (roster.length) {
+                setStepError(roster.join(' '));
+                return;
+            }
+            const incomplete = data.members.some((m) => !m.full_name.trim() || !m.cnic || !m.student_id || !m.institute_name || !m.gender || !m.email || !m.contact);
+            if (incomplete) {
+                setStepError('Complete all required fields for every player.');
+                return;
+            }
+            const gamePick = data.members.some((m) => m.module_ids.length < 1);
+            if (gamePick) {
+                setStepError('Each player must be assigned at least one selected game (max two per player).');
+                return;
+            }
+        }
+        setStep((s) => Math.min(steps.length - 1, s + 1));
+    }
 
     function submit() {
         post('/delegations');
@@ -251,7 +334,9 @@ export default function DelegationCreate({
             <div className="mx-auto max-w-4xl space-y-6">
                 <div>
                     <h1 className="text-2xl font-semibold">Add Delegation</h1>
-                    <p className="text-sm text-muted-foreground">Flow: Games -> Members -> Socials -> Spectators -> Cart -> Payment status.</p>
+                    <p className="text-sm text-muted-foreground">
+                        Choose any number of games, assign players (meet each game&apos;s minimum roster), then pick socials per person. Individual vs group base fee is set automatically from player count.
+                    </p>
                 </div>
 
                 <div className="rounded-md border border-cyan-400/20 bg-[#13123A] px-3 py-4">
@@ -278,7 +363,7 @@ export default function DelegationCreate({
 
                 {step === 0 && (
                     <div className="space-y-4 rounded-md border border-cyan-400/20 bg-[#0D0C25] p-4">
-                        <Label>Select Games (max 2 at delegation level)</Label>
+                        <Label>Select games for your delegation (no fixed limit)</Label>
                         <div className="grid gap-3 md:grid-cols-2">
                             {modules.map((module) => {
                                 const checked = data.module_ids.includes(module.id);
@@ -291,7 +376,7 @@ export default function DelegationCreate({
                                             onChange={() => {
                                                 const next = checked
                                                     ? data.module_ids.filter((id) => id !== module.id)
-                                                    : [...data.module_ids, module.id].slice(0, 2);
+                                                    : [...data.module_ids, module.id];
                                                 setData('module_ids', next);
                                             }}
                                         />
@@ -306,7 +391,8 @@ export default function DelegationCreate({
                                             )}
                                             <div className="text-xs text-muted-foreground line-clamp-3">{module.intro}</div>
                                             <div className="text-xs text-muted-foreground">
-                                                Fee: PKR {moduleGameFee(module, earlyBirdEnabled)} | Team Size: {module.team_size || 1} | Venue: {module.venue || 'TBD'}
+                                                Fee: PKR {moduleGameFee(module, earlyBirdEnabled)} | Min. players needed: {Math.max(1, module.team_size ?? 1)} | Venue:{' '}
+                                                {module.venue || 'TBD'}
                                             </div>
                                         </div>
                                     </label>
@@ -318,29 +404,23 @@ export default function DelegationCreate({
 
                 {step === 1 && (
                     <div className="space-y-4 rounded-md border border-cyan-400/20 bg-[#0D0C25] p-4">
-                        <div className="grid gap-2 md:grid-cols-2">
-                            <div className="grid gap-2">
-                                <Label>Delegation Type</Label>
-                                <select
-                                    className="rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                    value={data.type}
-                                    onChange={(e) => {
-                                        const nextType = e.target.value as 'individual' | 'group';
-                                        setData('type', nextType);
-                                        if (nextType === 'individual') {
-                                            setData('members', [data.members[0] ?? { ...emptyMember }]);
-                                        }
-                                    }}
-                                >
-                                    <option value="individual">Individual</option>
-                                    <option value="group">Group</option>
-                                </select>
-                            </div>
+                        <div className="rounded-md border border-cyan-400/25 bg-[#13123A]/80 px-4 py-3 text-sm text-muted-foreground">
+                            <p className="font-medium text-cyan-100">Head delegate</p>
+                            <p className="mt-1">
+                                You are registering this delegation. Enter every player&apos;s details. With{' '}
+                                <strong className="text-foreground">one player</strong>, the base fee is individual (PKR 1,000 gross); with{' '}
+                                <strong className="text-foreground">two or more players</strong>, the group base fee applies (PKR 3,000 gross).
+                            </p>
+                            <p className="mt-2 text-xs">
+                                For each selected game, at least the listed minimum number of players must be assigned to that game across your roster (checkboxes below).
+                            </p>
                         </div>
                         {data.members.map((member, index) => (
                             <div key={index} className="space-y-2">
                                 <div className="flex items-center justify-between">
-                                    <p className="text-sm font-medium">Member {index + 1}</p>
+                                    <p className="text-sm font-medium text-cyan-100">
+                                        {index === 0 ? 'Head delegate' : `Player ${index + 1}`}
+                                    </p>
                                     {data.members.length > 1 && (
                                         <Button
                                             type="button"
@@ -353,6 +433,7 @@ export default function DelegationCreate({
                                     )}
                                 </div>
                                 <PersonFields
+                                    heading={index === 0 ? 'Head delegate — contact person' : `Player ${index + 1}`}
                                     value={member}
                                     selectedModuleIds={data.module_ids}
                                     modules={modules}
@@ -364,47 +445,53 @@ export default function DelegationCreate({
                                 />
                             </div>
                         ))}
-                        {!individualMode && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setData('members', [...data.members, { ...emptyMember }])}
-                            >
-                                + Add Member
-                            </Button>
-                        )}
+                        <Button type="button" variant="outline" onClick={() => setData('members', [...data.members, { ...emptyMember }])}>
+                            + Add player
+                        </Button>
                     </div>
                 )}
 
                 {step === 2 && (
                     <div className="space-y-4 rounded-md border border-cyan-400/20 bg-[#0D0C25] p-4">
-                        <Label>Socials</Label>
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                checked={data.socials.includes('qawali_night')}
-                                onChange={() => {
-                                    const next = data.socials.includes('qawali_night')
-                                        ? data.socials.filter((s) => s !== 'qawali_night')
-                                        : [...data.socials, 'qawali_night'];
-                                    setData('socials', next);
-                                }}
-                            />
-                            Qawali Night (Free)
-                        </label>
-                        <label className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                checked={data.socials.includes('beach_party')}
-                                onChange={() => {
-                                    const next = data.socials.includes('beach_party')
-                                        ? data.socials.filter((s) => s !== 'beach_party')
-                                        : [...data.socials, 'beach_party'];
-                                    setData('socials', next);
-                                }}
-                            />
-                            Beach Party (PKR 3500 per member)
-                        </label>
+                        <Label>Social events (per player)</Label>
+                        <p className="text-xs text-muted-foreground">
+                            Each person chooses Qawali Night and/or Beach Party. Per-person amounts follow admin delegate rates below. Early-bird discount applies to social add-ons when enabled.
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                            Current delegate rates: Qawali{' '}
+                            {socialPricing.qawali_night <= 0 ? 'free' : `PKR ${socialPricing.qawali_night.toLocaleString()}`}, Beach PKR{' '}
+                            {socialPricing.beach_party.toLocaleString()} each selected person.
+                        </p>
+                        {data.members.map((member, index) => (
+                            <div key={index} className="space-y-3 rounded-md border border-cyan-400/15 bg-[#13123A] p-4">
+                                <p className="text-sm font-medium text-cyan-100">
+                                    {index === 0 ? 'Head delegate' : `Player ${index + 1}`}
+                                    {member.full_name?.trim() ? ` — ${member.full_name.trim()}` : ''}
+                                </p>
+                                <div className="flex flex-col gap-2">
+                                    {(['qawali_night', 'beach_party'] as const).map((key) => (
+                                        <label key={key} className="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                checked={member.social_selections.includes(key)}
+                                                onChange={() => {
+                                                    const copy = [...data.members];
+                                                    const sel = new Set(copy[index].social_selections);
+                                                    if (sel.has(key)) {
+                                                        sel.delete(key);
+                                                    } else {
+                                                        sel.add(key);
+                                                    }
+                                                    copy[index] = { ...copy[index], social_selections: [...sel] };
+                                                    setData('members', copy);
+                                                }}
+                                            />
+                                            {socialLabels[key]}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
 
@@ -450,14 +537,20 @@ export default function DelegationCreate({
                 )}
 
                 {step === 4 && (
-                    <div className="space-y-2 rounded-md border border-cyan-400/20 bg-[#0D0C25] p-4 text-sm">
+                    <div className="space-y-3 rounded-md border border-cyan-400/20 bg-[#0D0C25] p-4 text-sm">
                         {cart.registrationDiscountActive && (
                             <p className="mb-2 text-xs text-cyan-300/90">
                                 Early bird: {registrationDiscountPercent}% off base fee and social add-ons only (game and spectator lines are unchanged).
                             </p>
                         )}
+                        <p className="text-xs text-muted-foreground">
+                            Delegation type (for pricing): <strong className="text-foreground">{cart.delegationLabel}</strong> —{' '}
+                            {delegationIsGroup ? 'two or more players' : 'single player'}.
+                        </p>
                         <div className="flex justify-between gap-4">
-                            <span>Base Fee</span>
+                            <span>
+                                Base fee ({cart.delegationLabel}) {cart.delegationLabel === 'Individual' ? '(gross 1,000)' : '(gross 3,000)'}
+                            </span>
                             <span className="text-right">
                                 {cart.registrationDiscountActive && cart.baseGross !== cart.baseFee ? (
                                     <>
@@ -469,12 +562,34 @@ export default function DelegationCreate({
                                 )}
                             </span>
                         </div>
-                        <div className="flex justify-between">
-                            <span>Games Fee</span>
-                            <span>PKR {cart.gamesFee}</span>
+                        <div className="border-t border-cyan-400/10 pt-2">
+                            <p className="mb-1 text-xs font-medium text-cyan-200">Games / modules</p>
+                            {cart.selectedModules.length === 0 ? (
+                                <p className="text-xs text-muted-foreground">No games selected.</p>
+                            ) : (
+                                cart.selectedModules.map((m) => (
+                                    <div key={m.id} className="flex justify-between text-xs">
+                                        <span>{m.name}</span>
+                                        <span>PKR {moduleGameFee(m, earlyBirdEnabled)}</span>
+                                    </div>
+                                ))
+                            )}
+                            <div className="mt-1 flex justify-between font-medium">
+                                <span>Games subtotal</span>
+                                <span>PKR {cart.gamesFee}</span>
+                            </div>
                         </div>
-                        <div className="flex justify-between gap-4">
-                            <span>Socials Fee</span>
+                        <div className="flex justify-between gap-4 border-t border-cyan-400/10 pt-2">
+                            <span>
+                                Social add-ons (delegate rates){' '}
+                                <span className="block text-[11px] font-normal text-muted-foreground">
+                                    Qawali selected × {cart.qawaliCount}
+                                    {socialPricing.qawali_night > 0
+                                        ? ` × PKR ${socialPricing.qawali_night.toLocaleString()}`
+                                        : ' (free)'}
+                                    ; Beach × {cart.beachCount} × PKR {socialPricing.beach_party.toLocaleString()}
+                                </span>
+                            </span>
                             <span className="text-right">
                                 {cart.registrationDiscountActive && cart.socialGross !== cart.socialFee ? (
                                     <>
@@ -487,7 +602,7 @@ export default function DelegationCreate({
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span>Spectators Fee</span>
+                            <span>Spectators ({data.spectators.length} × 500)</span>
                             <span>PKR {cart.spectatorFee}</span>
                         </div>
                         <div className="mt-2 flex justify-between border-t border-cyan-400/20 pt-2 font-semibold">
@@ -512,12 +627,24 @@ export default function DelegationCreate({
                     </div>
                 )}
 
+                {stepError && (
+                    <div className="rounded border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-100">{stepError}</div>
+                )}
+
                 <div className="flex items-center justify-between">
-                    <Button type="button" variant="ghost" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        disabled={step === 0}
+                        onClick={() => {
+                            setStepError(null);
+                            setStep((s) => Math.max(0, s - 1));
+                        }}
+                    >
                         Previous
                     </Button>
                     {step < steps.length - 1 ? (
-                        <Button type="button" onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}>
+                        <Button type="button" onClick={goNext}>
                             Next
                         </Button>
                     ) : (
@@ -527,9 +654,9 @@ export default function DelegationCreate({
                     )}
                 </div>
 
-                {(errors.members || errors.module_ids || errors.type) && (
+                {(errors.members || errors.module_ids) && (
                     <div className="rounded border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
-                        {errors.members || errors.module_ids || errors.type}
+                        {errors.members || errors.module_ids}
                     </div>
                 )}
             </div>

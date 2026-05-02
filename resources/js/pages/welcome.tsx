@@ -4,6 +4,7 @@ import {
     Menu, X, Instagram, Mail, Phone, MapPin,
     ChevronDown, Crown, Gamepad2, Target, Zap, Wind,
     Activity, Users, Dumbbell, ArrowRight, ShoppingCart,
+    Music, Palmtree,
 } from 'lucide-react';
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
@@ -21,6 +22,18 @@ function moduleIcon(name: string): React.ElementType {
     return MODULE_ICONS[name.toLowerCase()] ?? Gamepad2;
 }
 
+function socialEventIcon(slug: string): React.ElementType {
+    return slug === 'beach_party' ? Palmtree : Music;
+}
+
+function formatSocialPkrAmount(n: number): string {
+    if (n <= 0) {
+        return 'Free';
+    }
+
+    return `PKR ${n.toLocaleString()}`;
+}
+
 
 export default function Welcome() {
     type GalleryItem = { id: number; label: string; image_url: string; wide: boolean; sort_order: number };
@@ -33,16 +46,26 @@ export default function Welcome() {
         first_prize: string; second_prize: string; min_delegations: number; max_delegations: number; min_participants: number; max_participants: number;
     };
 
-    const { earlyBirdDate, earlyBirdEnabled, galleryItems, modules } = usePage<{
+    type SocialEvent = {
+        slug: string;
+        name: string;
+        delegate_pkr: number;
+        outsider_pkr: number;
+        image_url: string | null;
+    };
+
+    const { earlyBirdDate, earlyBirdEnabled, galleryItems, modules, socialEvents } = usePage<{
         earlyBirdDate: string;
         earlyBirdEnabled: boolean;
         galleryItems: GalleryItem[];
         modules: Module[];
+        socialEvents: SocialEvent[];
     }>().props;
     const [menuOpen, setMenuOpen]         = useState(false);
     const [scrolled, setScrolled]         = useState(false);
     const [hoveredMod, setHoveredMod]     = useState<number | null>(null);
     const [hoveredGal, setHoveredGal]     = useState<number | null>(null);
+    const [hoveredSoc, setHoveredSoc]     = useState<number | null>(null);
 
     const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -297,11 +320,16 @@ export default function Welcome() {
                 }
                 .mod-footer {
                     display: flex;
+                    flex-wrap: wrap;
                     align-items: flex-end;
                     justify-content: space-between;
-                    gap: 12px;
+                    gap: 10px 12px;
                     border-top: 1px solid rgba(0,229,255,0.14);
                     padding-top: 12px;
+                }
+                .mod-fee-col {
+                    min-width: 0;
+                    flex: 1 1 auto;
                 }
                 .mod-fee {
                     background: linear-gradient(135deg, #00E5FF 0%, #A855F7 55%, #FF6EB4 100%);
@@ -309,25 +337,56 @@ export default function Welcome() {
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                     font-family: 'Russo One', sans-serif;
-                    font-size: 34px;
+                    font-size: clamp(1.35rem, 4.5vw + 0.6rem, 2.125rem);
                     letter-spacing: .01em;
-                    line-height: 1;
+                    line-height: 1.05;
+                    overflow-wrap: anywhere;
+                    word-break: break-word;
                 }
                 .mod-register-btn {
                     display: inline-flex;
                     align-items: center;
-                    gap: 8px;
+                    justify-content: center;
+                    gap: clamp(4px, 1.5vw, 8px);
                     background: linear-gradient(135deg, rgba(0,229,255,0.16), rgba(168,85,247,0.2));
                     color: #F0EEFF;
                     border: 1px solid rgba(0,229,255,0.35);
                     border-radius: 10px;
-                    padding: 10px 16px;
+                    padding: clamp(8px, 2vw, 10px) clamp(10px, 3vw, 16px);
                     font-weight: 700;
-                    font-size: 22px;
+                    font-size: clamp(14px, 3.5vw, 22px);
                     cursor: pointer;
                     text-decoration: none;
-                    flex-shrink: 0;
+                    flex: 0 0 auto;
+                    max-width: 100%;
+                    box-sizing: border-box;
                     transition: transform .2s ease, background .2s ease;
+                }
+                .mod-register-btn svg {
+                    flex-shrink: 0;
+                    width: 1em;
+                    height: 1em;
+                }
+                @media (max-width: 767px) {
+                    .mod-footer {
+                        flex-direction: column;
+                        align-items: stretch;
+                        justify-content: flex-start;
+                        gap: 14px;
+                    }
+                    .mod-fee-col {
+                        flex: none;
+                        width: 100%;
+                        text-align: center;
+                    }
+                    .mod-fee {
+                        text-align: center;
+                    }
+                    .mod-register-btn {
+                        flex: none;
+                        width: 100%;
+                        min-height: 44px;
+                    }
                 }
                 .mod-register-btn:hover {
                     background: linear-gradient(135deg, rgba(0,229,255,0.24), rgba(168,85,247,0.3));
@@ -396,34 +455,35 @@ export default function Welcome() {
                 borderBottom: scrolled ? '1px solid rgba(0,229,255,0.1)' : 'none',
                 transition: 'all .4s',
             }}>
-                <button onClick={() => scrollTo('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                <button type="button" onClick={() => scrollTo('home')} className="shrink-0 text-left" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                     <span style={{ fontFamily: 'Russo One, sans-serif', fontSize: '22px', letterSpacing: '.06em', background: 'linear-gradient(135deg, #00E5FF, #A855F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>KGL</span>
                     <span style={{ fontFamily: 'Chakra Petch, sans-serif', fontSize: '13px', color: '#8B8BAF', marginLeft: '6px', fontWeight: 400 }}>2026</span>
                 </button>
 
-                <div style={{ display: 'flex', gap: '36px', alignItems: 'center' }} className="hidden md:flex">
-                    {['home','about','gallery','modules','contact'].map(s => (
+                {/* Use only Tailwind for display — inline display:flex would override `hidden` on mobile */}
+                <div className="hidden md:flex md:items-center md:gap-9">
+                    {['home','about','gallery','socials','modules','contact'].map(s => (
                         <span key={s} className="nav-link" onClick={() => scrollTo(s)}>{s}</span>
                     ))}
                 </div>
 
-                <div className="hidden md:flex" style={{ alignItems: 'center', gap: '12px' }}>
+                <div className="hidden md:flex md:items-center md:gap-3">
                     <Link href="/login" className="btn-outline">Log in</Link>
                     <Link href="/register" className="btn-holo">Register Now</Link>
                 </div>
 
-                <button onClick={() => setMenuOpen(o => !o)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#00E5FF', padding: '4px' }} className="flex md:hidden">
+                <button type="button" aria-expanded={menuOpen} aria-label={menuOpen ? 'Close menu' : 'Open menu'} onClick={() => setMenuOpen(o => !o)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#00E5FF', padding: '4px' }} className="flex shrink-0 items-center justify-center md:hidden">
                     {menuOpen ? <X size={22} /> : <Menu size={22} />}
                 </button>
             </nav>
 
             {/* Mobile menu */}
             {menuOpen && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(8,7,26,.97)', zIndex: 45, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '48px' }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(8,7,26,.97)', zIndex: 60, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '48px' }}>
                     <button onClick={() => setMenuOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', color: '#00E5FF' }}>
                         <X size={24} />
                     </button>
-                    {['home','about','gallery','modules','contact'].map(s => (
+                    {['home','about','gallery','socials','modules','contact'].map(s => (
                         <button key={s} onClick={() => scrollTo(s)} style={{ background: 'none', border: 'none', fontFamily: 'Russo One, sans-serif', fontSize: '40px', color: '#F0EEFF', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '.05em', transition: 'color .2s' }}
                             onMouseEnter={e => (e.currentTarget.style.color = '#00E5FF')}
                             onMouseLeave={e => (e.currentTarget.style.color = '#F0EEFF')}>
@@ -651,6 +711,79 @@ export default function Welcome() {
                 </div>
             </section>
 
+            {/* ── SOCIALS ─────────────────────────────────────────────── */}
+            <section id="socials" style={{ position: 'relative', padding: 'clamp(72px,13vh,128px) clamp(20px,7vw,110px)', background: '#08071A' }}>
+                <div className="divider" style={{ position: 'absolute', top: 0, left: '8%', right: '8%' }} />
+
+                <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                    <p className="sec-label">Socials</p>
+                    <h2 className="sec-heading" style={{ marginBottom: '12px' }}>
+                        EVENING<br /><span>EVENTS</span>
+                    </h2>
+                    <p style={{ color: '#8B8BAF', fontSize: '14px', fontWeight: 300, lineHeight: 1.8, maxWidth: '560px', marginBottom: '48px' }}>
+                        Two flagship socials alongside the league. Delegate rates apply when you register as part of a delegation; outsider rates are for guests who are not on a registered delegation.
+                    </p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,340px),1fr))', gap: '20px' }}>
+                        {socialEvents.map((ev, i) => {
+                            const Icon = socialEventIcon(ev.slug);
+                            return (
+                                <div
+                                    key={ev.slug}
+                                    className="mod-card"
+                                    onMouseEnter={() => setHoveredSoc(i)}
+                                    onMouseLeave={() => setHoveredSoc(null)}
+                                >
+                                    {ev.image_url ? (
+                                        <img src={ev.image_url} alt={ev.name} className="mod-cover" />
+                                    ) : (
+                                        <div className="mod-cover-fallback">
+                                            <div className="mod-icon" style={{ color: hoveredSoc === i ? '#00E5FF' : undefined }}>
+                                                <Icon size={38} />
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="mod-name">{ev.name}</div>
+                                    <div className="mod-desc" style={{ minHeight: 'auto', marginBottom: '18px' }}>
+                                        Photos and full descriptions can be published from admin later. Pricing below is shown in Pakistani Rupees.
+                                    </div>
+                                    <div style={{ borderTop: '1px solid rgba(0,229,255,0.14)', paddingTop: '14px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
+                                            <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: '#8B8BAF' }}>
+                                                Delegate (registered)
+                                            </span>
+                                            <span
+                                                className="mod-fee"
+                                                style={{
+                                                    fontSize: 'clamp(1.15rem, 3.5vw + 0.5rem, 1.65rem)',
+                                                    textAlign: 'right',
+                                                }}
+                                            >
+                                                {formatSocialPkrAmount(ev.delegate_pkr)}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap' }}>
+                                            <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: '#8B8BAF' }}>
+                                                Non-delegate (outsider)
+                                            </span>
+                                            <span
+                                                className="mod-fee"
+                                                style={{
+                                                    fontSize: 'clamp(1.15rem, 3.5vw + 0.5rem, 1.65rem)',
+                                                    textAlign: 'right',
+                                                }}
+                                            >
+                                                {formatSocialPkrAmount(ev.outsider_pkr)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </section>
+
             {/* ── MODULES ────────────────────────────────────────────── */}
             <section id="modules" style={{ position: 'relative', padding: 'clamp(72px,13vh,128px) clamp(20px,7vw,110px)', background: '#0D0C25' }}>
                 <div className="divider" style={{ position: 'absolute', top: 0, left: '8%', right: '8%' }} />
@@ -683,7 +816,7 @@ export default function Welcome() {
                                     <div className="mod-name">{mod.name}</div>
                                     <div className="mod-desc">{mod.intro}</div>
                                     <div className="mod-footer">
-                                        <div>
+                                        <div className="mod-fee-col">
                                             <div className="mod-fee">{displayPrice}</div>
                                         </div>
                                         <Link href="/register" className="mod-register-btn">

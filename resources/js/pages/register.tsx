@@ -42,7 +42,7 @@ const RULES = [
     'Only one person allowed per pass — non-transferable.',
     'No outside food or drink allowed on premises.',
     'Strict prohibition of weapons and drugs — violators face immediate legal action.',
-    'Maximum two games allowed per delegate.',
+    'Each player may compete in at most two games total (roster step in the authenticated portal).',
 ];
 
 const EVENT_NAME  = 'Karachi Gala League 2026';
@@ -160,7 +160,7 @@ export default function Register() {
     const onsiteRem = totalFee - onsiteNow;
 
     const toggleGame = (name: string) =>
-        setSelected(p => p.includes(name) ? p.filter(g => g !== name) : p.length >= 2 ? p : [...p, name]);
+        setSelected((p) => (p.includes(name) ? p.filter((g) => g !== name) : [...p, name]));
 
     const handleFile = useCallback((file: File) => {
         setVoucher(file);
@@ -188,7 +188,7 @@ export default function Register() {
 
     const GameRow = ({ name, price, Icon: IconComp }: { name: string; price: number; Icon: React.ElementType; side: 'sport' | 'module' }) => {
         const isSel = selected.includes(name);
-        const isOff = !isSel && selected.length >= 2;
+        const isOff = false;
         return (
             <div onClick={() => !isOff && toggleGame(name)}
                 style={{
@@ -274,7 +274,7 @@ export default function Register() {
                     {[
                         { label: 'Event',  value: 'Karachi Gala League 2026' },
                         { label: 'Date',   value: 'Spring 2026 · TBA' },
-                        { label: 'Limit',  value: '2 Events Per Delegate' },
+                        { label: 'Games / player',  value: 'Max 2 (portal)' },
                     ].map(({ label, value }, i, a) => (
                         <div key={label} style={{ padding: '18px 28px', borderRight: i < a.length - 1 ? '1px solid rgba(0,229,255,0.12)' : 'none', textAlign: 'center', flex: '1 0 auto' }}>
                             <div style={{ fontFamily: "'Chakra Petch', sans-serif", fontSize: '9px', fontWeight: 700, letterSpacing: '.3em', textTransform: 'uppercase', color: '#00E5FF', marginBottom: '6px' }}>{label}</div>
@@ -321,7 +321,7 @@ export default function Register() {
 
             <div style={{ marginBottom: '48px', border: '1px solid rgba(0,229,255,0.12)', overflow: 'hidden' }}>
                 <div style={{ background: 'rgba(0,229,255,0.06)', padding: '12px 18px', borderBottom: '1px solid rgba(0,229,255,0.1)', fontFamily: "'Chakra Petch', sans-serif", fontSize: '10px', fontWeight: 700, letterSpacing: '.25em', textTransform: 'uppercase', color: '#00E5FF' }}>
-                    Select Up to 2 Events — Delegation Fees
+                    Select Events — Delegation Fees (full roster & pricing in logged-in portal)
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'rgba(0,229,255,0.04)' }}>
                     <div style={{ background: '#13123A' }}>

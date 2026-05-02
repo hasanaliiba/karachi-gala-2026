@@ -18,9 +18,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'email',
     'contact',
     'emergency_contact',
+    'social_selections',
 ])]
 class DelegationMember extends Model
 {
+    protected function casts(): array
+    {
+        return [
+            'social_selections' => 'array',
+        ];
+    }
+
     public function delegation(): BelongsTo
     {
         return $this->belongsTo(Delegation::class);
@@ -31,4 +39,3 @@ class DelegationMember extends Model
         return $this->hasMany(DelegationMemberModule::class);
     }
 }
-

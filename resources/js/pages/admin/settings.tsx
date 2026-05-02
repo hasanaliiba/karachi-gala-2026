@@ -9,15 +9,31 @@ type Props = {
     earlyBirdDate: string;
     earlyBirdEnabled: boolean;
     registrationDiscountPercent: number;
+    socialQawaliDelegatePkr: number;
+    socialQawaliOutsiderPkr: number;
+    socialBeachDelegatePkr: number;
+    socialBeachOutsiderPkr: number;
 };
 
-export default function AdminSettings({ earlyBirdDate, earlyBirdEnabled, registrationDiscountPercent }: Props) {
+export default function AdminSettings({
+    earlyBirdDate,
+    earlyBirdEnabled,
+    registrationDiscountPercent,
+    socialQawaliDelegatePkr,
+    socialQawaliOutsiderPkr,
+    socialBeachDelegatePkr,
+    socialBeachOutsiderPkr,
+}: Props) {
     const { props } = usePage<{ flash?: { success?: string } }>();
 
     const { data, setData, patch, processing, errors } = useForm({
         early_bird_date: earlyBirdDate,
         early_bird_enabled: earlyBirdEnabled,
         registration_discount_percent: registrationDiscountPercent,
+        social_qawali_delegate_pkr: socialQawaliDelegatePkr,
+        social_qawali_outsider_pkr: socialQawaliOutsiderPkr,
+        social_beach_delegate_pkr: socialBeachDelegatePkr,
+        social_beach_outsider_pkr: socialBeachOutsiderPkr,
     });
 
     function submit(e: React.FormEvent) {
@@ -99,6 +115,73 @@ export default function AdminSettings({ earlyBirdDate, earlyBirdEnabled, registr
                         {errors.registration_discount_percent && (
                             <p className="text-sm text-red-500">{errors.registration_discount_percent}</p>
                         )}
+                    </div>
+
+                    <div className="grid gap-4 rounded-md border border-cyan-400/15 p-4" style={{ borderColor: 'rgba(0,229,255,0.12)' }}>
+                        <p className="text-sm font-medium text-foreground">Social events — PKR amounts</p>
+                        <p className="text-xs" style={{ color: '#8B8BAF' }}>
+                            Delegate rates apply at delegation checkout. Outsider rates are shown on the public home page for guests who are not registered delegates (future ticketing).
+                        </p>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="social_qawali_delegate_pkr">Qawali Night — delegate (registered)</Label>
+                            <Input
+                                id="social_qawali_delegate_pkr"
+                                type="number"
+                                min={0}
+                                max={9999999}
+                                value={data.social_qawali_delegate_pkr}
+                                onChange={(e) => setData('social_qawali_delegate_pkr', Number(e.target.value))}
+                                required
+                            />
+                            {errors.social_qawali_delegate_pkr && (
+                                <p className="text-sm text-red-500">{errors.social_qawali_delegate_pkr}</p>
+                            )}
+                        </div>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="social_qawali_outsider_pkr">Qawali Night — outsider (non-delegate)</Label>
+                            <Input
+                                id="social_qawali_outsider_pkr"
+                                type="number"
+                                min={0}
+                                max={9999999}
+                                value={data.social_qawali_outsider_pkr}
+                                onChange={(e) => setData('social_qawali_outsider_pkr', Number(e.target.value))}
+                                required
+                            />
+                            {errors.social_qawali_outsider_pkr && (
+                                <p className="text-sm text-red-500">{errors.social_qawali_outsider_pkr}</p>
+                            )}
+                        </div>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="social_beach_delegate_pkr">Beach Party — delegate (registered)</Label>
+                            <Input
+                                id="social_beach_delegate_pkr"
+                                type="number"
+                                min={0}
+                                max={9999999}
+                                value={data.social_beach_delegate_pkr}
+                                onChange={(e) => setData('social_beach_delegate_pkr', Number(e.target.value))}
+                                required
+                            />
+                            {errors.social_beach_delegate_pkr && (
+                                <p className="text-sm text-red-500">{errors.social_beach_delegate_pkr}</p>
+                            )}
+                        </div>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="social_beach_outsider_pkr">Beach Party — outsider (non-delegate)</Label>
+                            <Input
+                                id="social_beach_outsider_pkr"
+                                type="number"
+                                min={0}
+                                max={9999999}
+                                value={data.social_beach_outsider_pkr}
+                                onChange={(e) => setData('social_beach_outsider_pkr', Number(e.target.value))}
+                                required
+                            />
+                            {errors.social_beach_outsider_pkr && (
+                                <p className="text-sm text-red-500">{errors.social_beach_outsider_pkr}</p>
+                            )}
+                        </div>
                     </div>
 
                     <div>

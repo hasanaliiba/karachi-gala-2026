@@ -11,11 +11,11 @@ use App\Models\Module;
 use App\Models\Payment;
 use App\Models\PaymentProof;
 use App\Models\Setting;
+use App\Support\SocialPricing;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -51,6 +51,10 @@ class DelegationController extends Controller
                     0,
                     min(100, (int) Setting::get('registration_discount_percent', '25'))
                 ),
+                'socialPricing' => [
+                    SocialPricing::QAWALI_NIGHT => SocialPricing::delegatePkr(SocialPricing::QAWALI_NIGHT),
+                    SocialPricing::BEACH_PARTY => SocialPricing::delegatePkr(SocialPricing::BEACH_PARTY),
+                ],
             ]);
         }
 
@@ -61,6 +65,10 @@ class DelegationController extends Controller
                 0,
                 min(100, (int) Setting::get('registration_discount_percent', '25'))
             ),
+            'socialPricing' => [
+                SocialPricing::QAWALI_NIGHT => SocialPricing::delegatePkr(SocialPricing::QAWALI_NIGHT),
+                SocialPricing::BEACH_PARTY => SocialPricing::delegatePkr(SocialPricing::BEACH_PARTY),
+            ],
         ]);
     }
 
@@ -92,22 +100,17 @@ class DelegationController extends Controller
         $members = collect($data['members']);
         $spectators = collect($data['spectators'] ?? []);
 
-        if ($data['type'] === 'individual' && $members->count() !== 1) {
-            return back()->withErrors(['members' => 'Individual registration requires exactly one member.']);
-        }
+        $type = $members->count() > 1 ? 'group' : 'individual';
 
-        // Ensure per-module team size for group flows.
-        if ($data['type'] === 'group') {
-            foreach ($moduleIds as $moduleId) {
-                $required = max(1, (int) ($modules[$moduleId]->team_size ?? 1));
-                $assigned = $members->filter(function (array $member) use ($moduleId) {
-                    return in_array((int) $moduleId, array_map('intval', $member['module_ids'] ?? []), true);
-                })->count();
-                if ($assigned < $required) {
-                    return back()->withErrors([
-                        'members' => "Module {$modules[$moduleId]->name} requires at least {$required} members.",
-                    ]);
-                }
+        foreach ($moduleIds as $moduleId) {
+            $required = max(1, (int) ($modules[$moduleId]->team_size ?? 1));
+            $assigned = $members->filter(function (array $member) use ($moduleId) {
+                return in_array((int) $moduleId, array_map('intval', $member['module_ids'] ?? []), true);
+            })->count();
+            if ($assigned < $required) {
+                return back()->withErrors([
+                    'members' => "Module {$modules[$moduleId]->name} requires at least {$required} player(s) assigned.",
+                ]);
             }
         }
 
@@ -127,17 +130,23 @@ class DelegationController extends Controller
             }
         }
 
-        $baseGross = $data['type'] === 'individual' ? 1000 : 3000;
+        $baseGross = $type === 'individual' ? 1000 : 3000;
         $gamesTotalFee = $modules->sum(fn (Module $module) => $this->moduleFee($module));
-        $socials = collect($data['socials'] ?? [])->values()->all();
-        $socialGross = in_array('beach_party', $socials, true) ? ($members->count() * 3500) : 0;
+        $socialGross = $members->sum(function (array $member) {
+            return SocialPricing::delegateSelectionTotalPkr($member['social_selections'] ?? []);
+        });
+        $socials = $members
+            ->flatMap(fn (array $member) => $member['social_selections'] ?? [])
+            ->unique()
+            ->values()
+            ->all();
         $baseFee = $this->applyRegistrationDiscountToBaseOrSocial($baseGross);
         $socialTotalFee = $this->applyRegistrationDiscountToBaseOrSocial($socialGross);
         $spectatorTotalFee = $spectators->count() * 500;
         $grandTotal = $baseFee + $gamesTotalFee + $socialTotalFee + $spectatorTotalFee;
 
         DB::transaction(function () use (
-            $data,
+            $type,
             $socials,
             $members,
             $spectators,
@@ -150,8 +159,8 @@ class DelegationController extends Controller
         ) {
             $delegation = Delegation::create([
                 'user_id' => auth()->id(),
-                'delegation_code' => 'KGL-' . strtoupper(Str::random(8)),
-                'type' => $data['type'],
+                'delegation_code' => 'KGL-'.strtoupper(Str::random(8)),
+                'type' => $type,
                 'socials' => $socials,
                 'spectator_count' => $spectators->count(),
                 'undertaking_accepted' => true,
@@ -185,6 +194,7 @@ class DelegationController extends Controller
                     'email' => $memberData['email'],
                     'contact' => $memberData['contact'],
                     'emergency_contact' => $memberData['emergency_contact'] ?? null,
+                    'social_selections' => array_values(array_unique($memberData['social_selections'] ?? [])),
                 ]);
 
                 foreach ($memberData['module_ids'] as $moduleId) {
@@ -278,6 +288,7 @@ class DelegationController extends Controller
         $earlyBirdEnabled = filter_var(Setting::get('early_bird_enabled', '0'), FILTER_VALIDATE_BOOLEAN);
         $rawPrice = $earlyBirdEnabled ? ($module->early_bird_price ?? $module->normal_price) : $module->normal_price;
         $digits = preg_replace('/\D+/', '', (string) $rawPrice) ?? '';
+
         return (int) $digits;
     }
 
@@ -305,4 +316,3 @@ class DelegationController extends Controller
         return (int) round($grossPkr * (100 - $p) / 100);
     }
 }
-

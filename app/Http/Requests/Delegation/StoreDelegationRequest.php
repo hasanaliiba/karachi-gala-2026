@@ -15,11 +15,8 @@ class StoreDelegationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', Rule::in(['individual', 'group'])],
-            'module_ids' => ['required', 'array', 'min:1', 'max:2'],
+            'module_ids' => ['required', 'array', 'min:1', 'max:30'],
             'module_ids.*' => ['required', 'integer', 'exists:modules,id', 'distinct'],
-            'socials' => ['nullable', 'array'],
-            'socials.*' => ['required', Rule::in(['qawali_night', 'beach_party'])],
             'undertaking_accepted' => ['required', 'accepted'],
 
             'members' => ['required', 'array', 'min:1'],
@@ -33,6 +30,8 @@ class StoreDelegationRequest extends FormRequest
             'members.*.emergency_contact' => ['nullable', 'string', 'max:100'],
             'members.*.module_ids' => ['required', 'array', 'min:1', 'max:2'],
             'members.*.module_ids.*' => ['required', 'integer', 'exists:modules,id'],
+            'members.*.social_selections' => ['nullable', 'array'],
+            'members.*.social_selections.*' => ['required', Rule::in(['qawali_night', 'beach_party'])],
 
             'spectators' => ['nullable', 'array', 'max:10'],
             'spectators.*.full_name' => ['required', 'string', 'max:255'],
@@ -46,4 +45,3 @@ class StoreDelegationRequest extends FormRequest
         ];
     }
 }
-

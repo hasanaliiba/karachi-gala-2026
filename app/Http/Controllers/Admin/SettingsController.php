@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Support\SocialPricing;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,6 +21,10 @@ class SettingsController extends Controller
                 0,
                 min(100, (int) Setting::get('registration_discount_percent', '25'))
             ),
+            'socialQawaliDelegatePkr' => SocialPricing::delegatePkr(SocialPricing::QAWALI_NIGHT),
+            'socialQawaliOutsiderPkr' => SocialPricing::outsiderPkr(SocialPricing::QAWALI_NIGHT),
+            'socialBeachDelegatePkr' => SocialPricing::delegatePkr(SocialPricing::BEACH_PARTY),
+            'socialBeachOutsiderPkr' => SocialPricing::outsiderPkr(SocialPricing::BEACH_PARTY),
         ]);
     }
 
@@ -29,6 +34,10 @@ class SettingsController extends Controller
             'early_bird_date' => ['required', 'date_format:Y-m-d'],
             'early_bird_enabled' => ['required', 'boolean'],
             'registration_discount_percent' => ['required', 'integer', 'min:0', 'max:100'],
+            'social_qawali_delegate_pkr' => ['required', 'integer', 'min:0', 'max:9999999'],
+            'social_qawali_outsider_pkr' => ['required', 'integer', 'min:0', 'max:9999999'],
+            'social_beach_delegate_pkr' => ['required', 'integer', 'min:0', 'max:9999999'],
+            'social_beach_outsider_pkr' => ['required', 'integer', 'min:0', 'max:9999999'],
         ]);
 
         Setting::updateOrCreate(
@@ -42,6 +51,23 @@ class SettingsController extends Controller
         Setting::updateOrCreate(
             ['key' => 'registration_discount_percent'],
             ['value' => (string) $request->integer('registration_discount_percent')]
+        );
+
+        Setting::updateOrCreate(
+            ['key' => 'social_qawali_delegate_pkr'],
+            ['value' => (string) $request->integer('social_qawali_delegate_pkr')]
+        );
+        Setting::updateOrCreate(
+            ['key' => 'social_qawali_outsider_pkr'],
+            ['value' => (string) $request->integer('social_qawali_outsider_pkr')]
+        );
+        Setting::updateOrCreate(
+            ['key' => 'social_beach_delegate_pkr'],
+            ['value' => (string) $request->integer('social_beach_delegate_pkr')]
+        );
+        Setting::updateOrCreate(
+            ['key' => 'social_beach_outsider_pkr'],
+            ['value' => (string) $request->integer('social_beach_outsider_pkr')]
         );
 
         return back()->with('success', 'Settings saved.');
