@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'delegation_id',
+    'social_registration_id',
     'amount_due',
     'status',
     'rejection_reason',
@@ -29,9 +30,13 @@ class Payment extends Model
         return $this->belongsTo(Delegation::class);
     }
 
+    public function socialRegistration(): BelongsTo
+    {
+        return $this->belongsTo(SocialRegistration::class);
+    }
+
     public function proofs(): HasMany
     {
         return $this->hasMany(PaymentProof::class);
     }
 }
-

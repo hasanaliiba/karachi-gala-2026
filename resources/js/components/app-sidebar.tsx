@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ListChecks, PlusSquare } from 'lucide-react';
+import { ListChecks, PartyPopper, PlusSquare } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -25,6 +25,11 @@ const mainNavItems: NavItem[] = [
         title: 'List Delegations',
         href: '/delegations',
         icon: ListChecks,
+    },
+    {
+        title: 'Social registrations',
+        href: '/social-registrations',
+        icon: PartyPopper,
     },
 ];
 

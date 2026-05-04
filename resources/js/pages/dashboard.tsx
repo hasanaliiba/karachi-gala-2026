@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { dashboard } from '@/routes';
 
@@ -26,15 +26,36 @@ export default function Dashboard() {
             `}</style>
             <div className="kgl-dash-bg flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="kgl-dash-card relative aspect-video overflow-hidden rounded-xl">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-cyan-300/20" />
-                    </div>
-                    <div className="kgl-dash-card relative aspect-video overflow-hidden rounded-xl">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-cyan-300/20" />
-                    </div>
-                    <div className="kgl-dash-card relative aspect-video overflow-hidden rounded-xl">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-cyan-300/20" />
-                    </div>
+                    <Link
+                        href="/delegations/create"
+                        className="kgl-dash-card group relative flex aspect-video flex-col justify-end overflow-hidden rounded-xl p-5 no-underline"
+                    >
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-cyan-300/20 transition-opacity group-hover:opacity-80" />
+                        <span className="relative z-[1] font-semibold text-cyan-100">Delegate registration</span>
+                        <span className="relative z-[1] mt-1 text-xs text-muted-foreground">
+                            Games, roster, and delegate social add-ons
+                        </span>
+                    </Link>
+                    <Link
+                        href="/delegations"
+                        className="kgl-dash-card group relative flex aspect-video flex-col justify-end overflow-hidden rounded-xl p-5 no-underline"
+                    >
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-violet-300/15 transition-opacity group-hover:opacity-80" />
+                        <span className="relative z-[1] font-semibold text-cyan-100">My delegations</span>
+                        <span className="relative z-[1] mt-1 text-xs text-muted-foreground">
+                            List, payment proof, and status
+                        </span>
+                    </Link>
+                    <Link
+                        href="/social-registrations"
+                        className="kgl-dash-card group relative flex aspect-video flex-col justify-end overflow-hidden rounded-xl p-5 no-underline"
+                    >
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-emerald-300/15 transition-opacity group-hover:opacity-80" />
+                        <span className="relative z-[1] font-semibold text-cyan-100">Social registrations</span>
+                        <span className="relative z-[1] mt-1 text-xs text-muted-foreground">
+                            Non-delegate guests — list and payment flow
+                        </span>
+                    </Link>
                 </div>
                 <div className="kgl-dash-card relative min-h-[100vh] flex-1 overflow-hidden rounded-xl md:min-h-min">
                     <PlaceholderPattern className="absolute inset-0 size-full stroke-cyan-300/20" />

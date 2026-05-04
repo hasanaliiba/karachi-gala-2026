@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\DelegationController as AdminDelegationController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\DelegationController as AdminDelegationController;
+use App\Http\Controllers\Admin\SocialRegistrationController as AdminSocialRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -36,5 +37,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('delegations', [AdminDelegationController::class, 'index'])->name('delegations.index');
         Route::get('delegations/{delegation}', [AdminDelegationController::class, 'show'])->name('delegations.show');
         Route::post('delegations/{delegation}/verify', [AdminDelegationController::class, 'verify'])->name('delegations.verify');
+
+        Route::get('social-registrations', [AdminSocialRegistrationController::class, 'index'])->name('social-registrations.index');
+        Route::get('social-registrations/{socialRegistration}', [AdminSocialRegistrationController::class, 'show'])->name('social-registrations.show');
+        Route::post('social-registrations/{socialRegistration}/verify', [AdminSocialRegistrationController::class, 'verify'])->name('social-registrations.verify');
     });
 });

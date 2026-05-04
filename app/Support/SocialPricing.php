@@ -42,4 +42,17 @@ final class SocialPricing
 
         return $sum;
     }
+
+    /**
+     * @param  array<int, string>  $selections
+     */
+    public static function outsiderSelectionTotalPkr(array $selections): int
+    {
+        $sum = 0;
+        foreach (array_unique($selections) as $key) {
+            $sum += self::outsiderPkr((string) $key);
+        }
+
+        return $sum;
+    }
 }
