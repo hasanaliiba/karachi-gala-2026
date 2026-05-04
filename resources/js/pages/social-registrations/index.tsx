@@ -1,4 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import {
+    PaymentInstructionsCard,
+    shouldShowPendingPaymentInstructions,
+} from '@/components/payment-instructions-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -82,6 +86,11 @@ export default function SocialRegistrationIndex({
                                 </Link>
                             </div>
                         </div>
+                        {shouldShowPendingPaymentInstructions(reg.status) && (
+                            <PaymentInstructionsCard
+                                intro={`Pay PKR ${reg.grand_total_fee.toLocaleString()} using the details below. Include ${reg.registration_code} in your transfer note. Dummy values for now — replace with live banking info before launch.`}
+                            />
+                        )}
                         {reg.payment?.rejection_reason && (
                             <p className="rounded border border-red-500/30 bg-red-500/10 p-2 text-xs text-red-300">
                                 Rejected: {reg.payment.rejection_reason}

@@ -1,4 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import {
+    PaymentInstructionsCard,
+    shouldShowPendingPaymentInstructions,
+} from '@/components/payment-instructions-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -85,6 +89,11 @@ export default function DelegationIndex({ delegations }: { delegations: Delegati
                             <div>Socials: PKR {delegation.social_total_fee}</div>
                             <div>Spectators: PKR {delegation.spectator_total_fee}</div>
                         </div>
+                        {shouldShowPendingPaymentInstructions(delegation.status) && (
+                            <PaymentInstructionsCard
+                                intro={`Pay PKR ${delegation.grand_total_fee.toLocaleString()} using the details below. Include ${delegation.delegation_code} in your transfer note. Dummy values for now — replace with live banking info before launch.`}
+                            />
+                        )}
                         {delegation.payment?.rejection_reason && (
                             <p className="rounded border border-red-500/30 bg-red-500/10 p-2 text-xs text-red-300">
                                 Rejected: {delegation.payment.rejection_reason}
