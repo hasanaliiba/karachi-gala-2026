@@ -47,7 +47,7 @@ const RULES = [
 
 const EVENT_NAME  = 'Karachi Gala League 2026';
 const EVENT_DATE  = 'Spring 2026 · Date TBA';
-const EVENT_VENUE = 'IBA Main Campus, University Road, Karachi';
+const EVENT_VENUE = 'Venue TBA · Karachi';
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
 
@@ -347,7 +347,7 @@ export default function Register() {
                     <div><label style={labelStyle}>CNIC <span style={{ color: '#EF4444' }}>*</span></label><input type="text" placeholder="XXXXX-XXXXXXX-X" {...bind('cnic')} /></div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '32px' }}>
-                    <div><label style={labelStyle}>Student ID <span style={{ color: '#EF4444' }}>*</span></label><input type="text" placeholder="University student ID" {...bind('studentId')} /></div>
+                    <div><label style={labelStyle}>Student ID <span style={{ color: '#EF4444' }}>*</span></label><input type="text" placeholder="Institution student ID" {...bind('studentId')} /></div>
                     <div><label style={labelStyle}>Institute Name <span style={{ color: '#EF4444' }}>*</span></label><input type="text" placeholder="Your institution" {...bind('institute')} /></div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '32px' }}>
@@ -359,7 +359,7 @@ export default function Register() {
                     {[
                         { label: 'Event Name', value: EVENT_NAME },
                         { label: 'Date & Time', value: EVENT_DATE },
-                        { label: 'Venue',       value: 'IBA Main Campus' },
+                        { label: 'Venue',       value: 'Venue TBA' },
                     ].map(({ label, value }) => (
                         <div key={label}>
                             <label style={labelStyle}>{label}</label>
@@ -443,7 +443,7 @@ export default function Register() {
                             { l: 'Account Title', v: 'KGL Events Committee' },
                             { l: 'Bank',          v: 'Meezan Bank' },
                             { l: 'Account No.',   v: '0123 4567 8901' },
-                            { l: 'IBAN',          v: 'PK36MEZN0001234567890' },
+                            { l: 'Bank account number', v: 'PK36MEZN0001234567890' },
                             { l: 'EasyPaisa',     v: '0300-0000000' },
                             { l: 'JazzCash',      v: '0300-0000000' },
                         ].map(({ l, v }) => (
@@ -557,7 +557,7 @@ export default function Register() {
                         { l: 'Events',    v: selected.join(', ') || '—' },
                         { l: 'Total Fee', v: `Rs ${totalFee.toLocaleString()}` },
                         { l: 'Payment',   v: payMethod === 'online' ? 'Online (100%)' : 'Onsite (75%+25%)' },
-                        { l: 'Venue',     v: 'IBA Main Campus' },
+                        { l: 'Venue',     v: 'Venue TBA' },
                         { l: 'Status',    v: 'Pending Approval' },
                     ].map(({ l, v }) => (
                         <div key={l} style={{ padding: '14px 18px', borderBottom: '1px solid rgba(0,229,255,0.04)', borderRight: '1px solid rgba(0,229,255,0.04)' }}>

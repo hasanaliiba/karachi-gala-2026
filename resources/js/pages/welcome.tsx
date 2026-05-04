@@ -98,7 +98,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="Karachi Gala League 2026 — IBA Karachi" />
+            <Head title="Karachi Gala League 2026" />
 
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Chakra+Petch:wght@300;400;500;600;700&display=swap');
@@ -527,8 +527,8 @@ export default function Welcome() {
                     </p>
 
                     <p className="a3" style={{ fontSize: '14px', color: '#8B8BAF', letterSpacing: '.06em', maxWidth: '380px', margin: '0 auto 44px', lineHeight: 1.8, fontWeight: 400 }}>
-                        One campus. Fourteen arenas. Infinite glory.<br />
-                        <span style={{ color: '#00E5FF', fontSize: '11px', letterSpacing: '.15em' }}>— SPRING 2026 · IBA MAIN CAMPUS —</span>
+                        One league. Fourteen arenas. Infinite glory.<br />
+                        <span style={{ color: '#00E5FF', fontSize: '11px', letterSpacing: '.15em' }}>— SPRING 2026 · VENUE TBA —</span>
                     </p>
 
                     <div className="a4" style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -873,7 +873,7 @@ export default function Welcome() {
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', color: '#8B8BAF', fontSize: '13px', lineHeight: 1.7, fontWeight: 300 }}>
                                         <MapPin size={15} color="#00E5FF" style={{ marginTop: '3px', flexShrink: 0 }} />
-                                        IBA Main Campus, University Road, Karachi
+                                        · Karachi
                                     </div>
                                 </div>
                             </div>
@@ -916,7 +916,7 @@ export default function Welcome() {
                     <span style={{ fontFamily: 'Russo One, sans-serif', fontSize: '20px', background: 'linear-gradient(135deg, #00E5FF, #A855F7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '.06em' }}>
                         KGL <span style={{ fontFamily: 'Chakra Petch, sans-serif', fontSize: '14px', fontWeight: 400, background: 'none', WebkitTextFillColor: '#8B8BAF' }}>2026</span>
                     </span>
-                    <p style={{ fontSize: '11px', color: '#8B8BAF', letterSpacing: '.06em' }}>© 2026 Karachi Gala League · IBA Karachi</p>
+                    <p style={{ fontSize: '11px', color: '#8B8BAF', letterSpacing: '.06em' }}>© 2026 Karachi Gala League</p>
                     <a href="https://www.instagram.com/kgl2k26/" target="_blank" rel="noopener noreferrer" aria-label="Instagram @kgl2k26" className="footer-link" style={{ display: 'inline-flex' }}>
                         <Instagram size={15} />
                     </a>
