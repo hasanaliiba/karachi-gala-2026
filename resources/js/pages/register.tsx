@@ -1,12 +1,12 @@
 import { Head } from '@inertiajs/react';
-import { useState, useRef, useCallback } from 'react';
 import {
     Check, ArrowRight, ArrowLeft, Shield,
     X, Printer, ChevronDown, ChevronUp,
     AlertCircle, Upload, Crown, Gamepad2, Target,
-    Zap, Wind, Activity, Users, Dumbbell,
+    Zap, Wind, Activity, Users,
     Music, Layers, Dice5, Swords,
 } from 'lucide-react';
+import { useState, useRef, useCallback } from 'react';
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 
@@ -53,6 +53,7 @@ const EVENT_VENUE = 'Venue TBA · Karachi';
 
 function genCode(): string {
     const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
     return 'KGL-2026-' + Array.from({ length: 6 }, () => c[Math.floor(Math.random() * c.length)]).join('');
 }
 
@@ -64,10 +65,14 @@ function QRCode({ value }: { value: string }) {
         }),
     );
     const fp = (r: number, c: number) => {
-        for (let i = 0; i < 7; i++) for (let j = 0; j < 7; j++)
-            grid[r + i][c + j] = i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4);
+        for (let i = 0; i < 7; i++) {
+for (let j = 0; j < 7; j++) {
+grid[r + i][c + j] = i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4);
+}
+}
     };
     fp(0, 0); fp(0, sz - 7); fp(sz - 7, 0);
+
     return (
         <svg width={sz * cell} height={sz * cell} viewBox={`0 0 ${sz * cell} ${sz * cell}`} style={{ background: '#fff', display: 'block' }}>
             {grid.flatMap((row, i) => row.map((on, j) =>
@@ -88,6 +93,7 @@ function TabBar({ active, max, onSelect }: { active: number; max: number; onSele
                 const tab = i + 1;
                 const isActive   = active === tab;
                 const isDisabled = tab > max;
+
                 return (
                     <button key={tab} onClick={() => !isDisabled && onSelect(tab)}
                         style={{
@@ -189,6 +195,7 @@ export default function Register() {
     const GameRow = ({ name, price, Icon: IconComp }: { name: string; price: number; Icon: React.ElementType; side: 'sport' | 'module' }) => {
         const isSel = selected.includes(name);
         const isOff = false;
+
         return (
             <div onClick={() => !isOff && toggleGame(name)}
                 style={{
@@ -219,8 +226,12 @@ export default function Register() {
 
     const BackBtn = ({ to }: { to: number }) => (
         <button onClick={() => goTo(to)} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'none', border: '1px solid rgba(0,229,255,0.2)', color: '#8B8BAF', padding: '14px 24px', fontFamily: "'Chakra Petch', sans-serif", fontSize: '11px', letterSpacing: '.15em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#00E5FF'; e.currentTarget.style.color = '#00E5FF'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,229,255,0.2)'; e.currentTarget.style.color = '#8B8BAF'; }}>
+            onMouseEnter={e => {
+ e.currentTarget.style.borderColor = '#00E5FF'; e.currentTarget.style.color = '#00E5FF'; 
+}}
+            onMouseLeave={e => {
+ e.currentTarget.style.borderColor = 'rgba(0,229,255,0.2)'; e.currentTarget.style.color = '#8B8BAF'; 
+}}>
             <ArrowLeft size={13} /> Back
         </button>
     );
@@ -285,8 +296,12 @@ export default function Register() {
 
                 <button onClick={() => goTo(2)}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'linear-gradient(135deg, #00E5FF 0%, #A855F7 50%, #00E5FF 100%)', backgroundSize: '200% auto', color: '#08071A', border: 'none', padding: '18px 48px', fontFamily: "'Russo One', sans-serif", fontSize: '14px', letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all .3s', boxShadow: '0 0 30px rgba(0,229,255,0.2)' }}
-                    onMouseEnter={e => { e.currentTarget.style.backgroundPosition = 'right center'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,229,255,0.4)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.backgroundPosition = 'left center'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 0 30px rgba(0,229,255,0.2)'; }}>
+                    onMouseEnter={e => {
+ e.currentTarget.style.backgroundPosition = 'right center'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,229,255,0.4)'; 
+}}
+                    onMouseLeave={e => {
+ e.currentTarget.style.backgroundPosition = 'left center'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 0 30px rgba(0,229,255,0.2)'; 
+}}>
                     CLICK TO REGISTER <ArrowRight size={16} />
                 </button>
             </div>
@@ -477,19 +492,35 @@ export default function Register() {
 
             {!preview ? (
                 <div onClick={() => fileRef.current?.click()}
-                    onDragOver={e => { e.preventDefault(); setDragging(true); }}
+                    onDragOver={e => {
+ e.preventDefault(); setDragging(true); 
+}}
                     onDragLeave={() => setDragging(false)}
-                    onDrop={e => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
+                    onDrop={e => {
+ e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0];
+
+ if (f) {
+handleFile(f);
+} 
+}}
                     style={{ border: `1px dashed ${dragging ? '#00E5FF' : 'rgba(0,229,255,0.2)'}`, background: dragging ? 'rgba(0,229,255,0.04)' : '#13123A', padding: '64px 32px', textAlign: 'center', cursor: 'pointer', transition: 'all .25s', marginBottom: '40px' }}>
                     <Upload size={32} color="#00E5FF" style={{ margin: '0 auto 16px' }} />
                     <p style={{ fontFamily: "'Chakra Petch', sans-serif", fontSize: '14px', color: '#F0EEFF', marginBottom: '8px' }}>Drag & drop your voucher here</p>
                     <p style={{ fontFamily: "'Chakra Petch', sans-serif", fontSize: '11px', color: '#8B8BAF' }}>or click to browse · JPG, PNG, PDF · Max 10MB</p>
-                    <input ref={fileRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+                    <input ref={fileRef} type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={e => {
+ const f = e.target.files?.[0];
+
+ if (f) {
+handleFile(f);
+} 
+}} />
                 </div>
             ) : (
                 <div style={{ position: 'relative', marginBottom: '40px', border: '1px solid rgba(0,229,255,0.18)' }}>
                     <img src={preview} alt="Voucher" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain', display: 'block', background: '#13123A' }} />
-                    <button onClick={() => { setVoucher(null); setPreview(null); }}
+                    <button onClick={() => {
+ setVoucher(null); setPreview(null); 
+}}
                         style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(8,7,26,.9)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                         <X size={14} />
                     </button>
@@ -570,8 +601,12 @@ export default function Register() {
 
             <button onClick={() => window.print()}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'none', border: '1px solid rgba(0,229,255,0.25)', color: '#8B8BAF', padding: '14px 24px', fontFamily: "'Chakra Petch', sans-serif", fontSize: '11px', letterSpacing: '.15em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all .2s' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = '#00E5FF'; e.currentTarget.style.color = '#00E5FF'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(0,229,255,0.25)'; e.currentTarget.style.color = '#8B8BAF'; }}>
+                onMouseEnter={e => {
+ e.currentTarget.style.borderColor = '#00E5FF'; e.currentTarget.style.color = '#00E5FF'; 
+}}
+                onMouseLeave={e => {
+ e.currentTarget.style.borderColor = 'rgba(0,229,255,0.25)'; e.currentTarget.style.color = '#8B8BAF'; 
+}}>
                 <Printer size={13} /> Print / Save
             </button>
         </Section>

@@ -1,10 +1,10 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { publicMediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { publicMediaUrl } from '@/lib/utils';
 
 type Module = {
     id: number;
@@ -362,7 +362,10 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
     const [showAdd, setShowAdd] = useState(false);
 
     function deleteModule(id: number) {
-        if (!confirm('Delete this module? This cannot be undone.')) return;
+        if (!confirm('Delete this module? This cannot be undone.')) {
+return;
+}
+
         router.delete(`/admin/modules/${id}`);
     }
 
@@ -420,6 +423,7 @@ export default function AdminModules({ modules }: { modules: Module[] }) {
                 )}
                 {modules.map((module, index) => {
                     const coverUrl = publicMediaUrl(module.image_path);
+
                     return (
                     <div key={module.id} style={{ borderBottom: index < modules.length - 1 ? '1px solid rgba(0,229,255,0.08)' : 'none' }}>
                         <div className="flex items-start gap-4 p-4">

@@ -35,6 +35,7 @@ type Delegation = {
 
 function ProofUploader({ delegationId }: { delegationId: number }) {
     const { data, setData, post, processing } = useForm<{ proof: File | null }>({ proof: null });
+
     return (
         <div className="flex items-center gap-2">
             <Input

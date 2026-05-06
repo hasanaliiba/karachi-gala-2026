@@ -16,8 +16,10 @@ export function publicMediaUrl(path: string | null | undefined): string | null {
     if (!path) {
         return null;
     }
+
     if (path.startsWith('assets/')) {
         return '/' + path;
     }
+
     return '/storage/' + path;
 }

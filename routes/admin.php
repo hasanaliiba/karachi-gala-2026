@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DelegationController as AdminDelegationController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\ModuleController;
+use App\Http\Controllers\Admin\SocialsController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SocialRegistrationController as AdminSocialRegistrationController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
         Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
+
+        Route::get('socials', [SocialsController::class, 'edit'])->name('socials.edit');
+        Route::patch('socials', [SocialsController::class, 'update'])->name('socials.update');
+        Route::post('socials/save', [SocialsController::class, 'update'])->name('socials.save');
 
         // Gallery — reorder must be before {item} to avoid route conflict
         Route::get('gallery', [GalleryController::class, 'index'])->name('gallery.index');

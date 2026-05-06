@@ -1,11 +1,11 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { publicMediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { publicMediaUrl } from '@/lib/utils';
 
 type GalleryItem = {
     id: number;
@@ -133,7 +133,10 @@ export default function AdminGallery({ items }: { items: GalleryItem[] }) {
     const [editingId, setEditingId] = useState<number | null>(null);
 
     function deleteItem(id: number) {
-        if (!confirm('Delete this gallery image? This cannot be undone.')) return;
+        if (!confirm('Delete this gallery image? This cannot be undone.')) {
+return;
+}
+
         router.delete(`/admin/gallery/${id}`);
     }
 

@@ -12,6 +12,17 @@ use Laravel\Fortify\Features;
 
 class HomeController extends Controller
 {
+    private function publicMediaUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        return str_starts_with($path, 'assets/')
+            ? '/'.$path
+            : '/storage/'.$path;
+    }
+
     public function index(): Response
     {
         return Inertia::render('welcome', [
@@ -56,14 +67,14 @@ class HomeController extends Controller
                     'name' => 'Qawali Night',
                     'delegate_pkr' => SocialPricing::delegatePkr(SocialPricing::QAWALI_NIGHT),
                     'outsider_pkr' => SocialPricing::outsiderPkr(SocialPricing::QAWALI_NIGHT),
-                    'image_url' => null,
+                    'image_url' => $this->publicMediaUrl(Setting::get('social_qawali_image_path')),
                 ],
                 [
                     'slug' => SocialPricing::BEACH_PARTY,
                     'name' => 'Beach Party',
                     'delegate_pkr' => SocialPricing::delegatePkr(SocialPricing::BEACH_PARTY),
                     'outsider_pkr' => SocialPricing::outsiderPkr(SocialPricing::BEACH_PARTY),
-                    'image_url' => null,
+                    'image_url' => $this->publicMediaUrl(Setting::get('social_beach_image_path')),
                 ],
             ],
         ]);

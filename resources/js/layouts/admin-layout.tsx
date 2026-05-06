@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react';
 
 const navLinks = [
     { href: '/admin/settings', label: 'Settings' },
+    { href: '/admin/socials',  label: 'Socials' },
     { href: '/admin/gallery',  label: 'Gallery' },
     { href: '/admin/modules',  label: 'Modules' },
     { href: '/admin/delegations',  label: 'Delegations' },

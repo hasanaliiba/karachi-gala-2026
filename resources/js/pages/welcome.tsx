@@ -1,11 +1,11 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
 import {
     Menu, X, Instagram, Mail, Phone, MapPin,
     ChevronDown, Crown, Gamepad2, Target, Zap, Wind,
     Activity, Users, Dumbbell, ArrowRight, ShoppingCart,
     Music, Palmtree,
 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
     'chess':        Crown,
@@ -63,33 +63,35 @@ export default function Welcome() {
     }>().props;
     const [menuOpen, setMenuOpen]         = useState(false);
     const [scrolled, setScrolled]         = useState(false);
-    const [hoveredMod, setHoveredMod]     = useState<number | null>(null);
     const [hoveredGal, setHoveredGal]     = useState<number | null>(null);
     const [hoveredSoc, setHoveredSoc]     = useState<number | null>(null);
 
-    const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    const calcCountdown = useCallback(() => {
+        const target = new Date(earlyBirdDate + 'T00:00:00+05:00').getTime();
+        const diff = Math.max(0, target - Date.now());
+
+        return {
+            days:    Math.floor(diff / 86400000),
+            hours:   Math.floor((diff % 86400000) / 3600000),
+            minutes: Math.floor((diff % 3600000)  / 60000),
+            seconds: Math.floor((diff % 60000)    / 1000),
+        };
+    }, [earlyBirdDate]);
+
+    const [countdown, setCountdown] = useState(calcCountdown);
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 60);
         window.addEventListener('scroll', onScroll);
+
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
     useEffect(() => {
-        const target = new Date(earlyBirdDate + 'T00:00:00+05:00').getTime();
-        const calc = () => {
-            const diff = Math.max(0, target - Date.now());
-            return {
-                days:    Math.floor(diff / 86400000),
-                hours:   Math.floor((diff % 86400000) / 3600000),
-                minutes: Math.floor((diff % 3600000)  / 60000),
-                seconds: Math.floor((diff % 60000)    / 1000),
-            };
-        };
-        setCountdown(calc());
-        const id = setInterval(() => setCountdown(calc()), 1000);
+        const id = setInterval(() => setCountdown(calcCountdown()), 1000);
+
         return () => clearInterval(id);
-    }, [earlyBirdDate]);
+    }, [calcCountdown]);
 
     const scrollTo = (id: string) => {
         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -727,6 +729,7 @@ export default function Welcome() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,340px),1fr))', gap: '20px' }}>
                         {socialEvents.map((ev, i) => {
                             const Icon = socialEventIcon(ev.slug);
+
                             return (
                                 <div
                                     key={ev.slug}
@@ -798,13 +801,12 @@ export default function Welcome() {
                     </p>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,340px),1fr))', gap: '20px' }}>
-                        {modules.map((mod, i) => {
+                        {modules.map((mod) => {
                             const Icon = moduleIcon(mod.name);
                             const displayPrice = mod.normal_price ?? 'TBD';
+
                             return (
                                 <div key={mod.id} className="mod-card"
-                                    onMouseEnter={() => setHoveredMod(i)}
-                                    onMouseLeave={() => setHoveredMod(null)}
                                 >
                                     {mod.image_url ? (
                                         <img src={mod.image_url} alt={mod.name} className="mod-cover" />

@@ -1,9 +1,9 @@
 import { Head, useForm } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
-import { publicMediaUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { publicMediaUrl } from '@/lib/utils';
 
 type Module = {
     id: number;
@@ -31,7 +31,7 @@ type Person = {
     social_selections: string[];
 };
 
-type Spectator = Omit<Person, 'module_ids'>;
+type Spectator = Omit<Person, 'module_ids' | 'social_selections'>;
 
 type FormData = {
     module_ids: number[];
@@ -54,8 +54,15 @@ function formatCnic(value: string): string {
     const p1 = digits.slice(0, 5);
     const p2 = digits.slice(5, 12);
     const p3 = digits.slice(12, 13);
-    if (!p2) return p1;
-    if (!p3) return `${p1}-${p2}`;
+
+    if (!p2) {
+return p1;
+}
+
+    if (!p3) {
+return `${p1}-${p2}`;
+}
+
     return `${p1}-${p2}-${p3}`;
 }
 
@@ -85,11 +92,13 @@ const emptySpectator: Spectator = {
 
 function toFee(value: string | null): number {
     const digits = (value ?? '').replace(/\D+/g, '');
+
     return Number(digits || '0');
 }
 
 function moduleGameFee(m: Module, earlyBirdEnabled: boolean): number {
     const raw = earlyBirdEnabled ? (m.early_bird_price ?? m.normal_price) : m.normal_price;
+
     return toFee(raw);
 }
 
@@ -97,25 +106,32 @@ function applyRegistrationDiscount(gross: number, earlyBirdEnabled: boolean, per
     if (!earlyBirdEnabled || percent <= 0) {
         return gross;
     }
+
     return Math.round((gross * (100 - percent)) / 100);
 }
 
 function rosterErrors(members: Person[], moduleIds: number[], modulesList: Module[]): string[] {
     const errs: string[] = [];
+
     if (members.length < 1) {
         return ['Add at least one member.'];
     }
+
     for (const id of moduleIds) {
         const mod = modulesList.find((x) => x.id === id);
+
         if (!mod) {
             continue;
         }
+
         const required = Math.max(1, mod.team_size ?? 1);
         const assigned = members.filter((mem) => mem.module_ids.includes(id)).length;
+
         if (assigned < required) {
             errs.push(`${mod.name} requires at least ${required} player(s) assigned (${assigned} assigned).`);
         }
     }
+
     return errs;
 }
 
@@ -163,6 +179,7 @@ function PersonFields({
                     {selectedModuleIds.map((id) => {
                         const checked = value.module_ids.includes(id);
                         const module = modules.find((m) => m.id === id);
+
                         return (
                             <label key={id} className="inline-flex items-center gap-2 rounded border border-cyan-400/20 px-2 py-1 text-xs">
                                 <input
@@ -266,12 +283,15 @@ export default function DelegationCreate({
         const qawaliCount = data.members.filter((m) => m.social_selections.includes('qawali_night')).length;
         const socialGross = data.members.reduce((sum, m) => {
             let line = 0;
+
             if (m.social_selections.includes('qawali_night')) {
                 line += socialPricing.qawali_night;
             }
+
             if (m.social_selections.includes('beach_party')) {
                 line += socialPricing.beach_party;
             }
+
             return sum + line;
         }, 0);
         const gamesFee = selectedModules.reduce((sum, m) => sum + moduleGameFee(m, earlyBirdEnabled), 0);
@@ -280,6 +300,7 @@ export default function DelegationCreate({
         const socialFee = applyRegistrationDiscount(socialGross, earlyBirdEnabled, registrationDiscountPercent);
         const total = baseFee + gamesFee + socialFee + spectatorFee;
         const registrationDiscountActive = earlyBirdEnabled && registrationDiscountPercent > 0;
+
         return {
             selectedModules,
             baseGross,
@@ -298,29 +319,41 @@ export default function DelegationCreate({
 
     function goNext() {
         setStepError(null);
+
         if (step === 0) {
             if (data.module_ids.length < 1) {
                 setStepError('Select at least one game.');
+
                 return;
             }
         }
+
         if (step === 1) {
             const roster = rosterErrors(data.members, data.module_ids, modules);
+
             if (roster.length) {
                 setStepError(roster.join(' '));
+
                 return;
             }
+
             const incomplete = data.members.some((m) => !m.full_name.trim() || !m.cnic || !m.student_id || !m.institute_name || !m.gender || !m.email || !m.contact);
+
             if (incomplete) {
                 setStepError('Complete all required fields for every player.');
+
                 return;
             }
+
             const gamePick = data.members.some((m) => m.module_ids.length < 1);
+
             if (gamePick) {
                 setStepError('Each player must be assigned at least one selected game (max two per player).');
+
                 return;
             }
         }
+
         setStep((s) => Math.min(steps.length - 1, s + 1));
     }
 
@@ -344,6 +377,7 @@ export default function DelegationCreate({
                         {steps.map((label, index) => {
                             const done = index < step;
                             const active = index === step;
+
                             return (
                                 <button
                                     key={label}
@@ -368,6 +402,7 @@ export default function DelegationCreate({
                             {modules.map((module) => {
                                 const checked = data.module_ids.includes(module.id);
                                 const coverUrl = publicMediaUrl(module.image_path);
+
                                 return (
                                     <label key={module.id} className="flex items-start gap-2 rounded border border-cyan-400/15 bg-[#13123A] p-3">
                                         <input
@@ -477,11 +512,13 @@ export default function DelegationCreate({
                                                 onChange={() => {
                                                     const copy = [...data.members];
                                                     const sel = new Set(copy[index].social_selections);
+
                                                     if (sel.has(key)) {
                                                         sel.delete(key);
                                                     } else {
                                                         sel.add(key);
                                                     }
+
                                                     copy[index] = { ...copy[index], social_selections: [...sel] };
                                                     setData('members', copy);
                                                 }}
@@ -503,7 +540,10 @@ export default function DelegationCreate({
                                 type="button"
                                 variant="outline"
                                 onClick={() => {
-                                    if (data.spectators.length >= 10) return;
+                                    if (data.spectators.length >= 10) {
+return;
+}
+
                                     setData('spectators', [...data.spectators, { ...emptySpectator }]);
                                 }}
                             >

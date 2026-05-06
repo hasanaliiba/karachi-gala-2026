@@ -1,7 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
-import { useState } from 'react';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';

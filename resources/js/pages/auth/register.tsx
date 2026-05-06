@@ -1,6 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 
